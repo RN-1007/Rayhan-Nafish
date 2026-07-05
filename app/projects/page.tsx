@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { Howl } from 'howler';
+
+const hoverSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/hover.mp3'], volume: 0.5 }) : null;
+const backSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/back.mp3'], volume: 0.8 }) : null;
 
 const projects = [
   {
@@ -42,17 +47,62 @@ const projects = [
 
 export default function ProjectsPage() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [isWiping, setIsWiping] = useState(false);
   const [selectedProject, setSelectedProject] = useState(0);
+
+  const handleBack = useCallback((e?: React.MouseEvent | KeyboardEvent) => {
+    if (e) e.preventDefault();
+    if (isWiping) return;
+    setIsWiping(true);
+    
+    backSound?.play();
+
+    gsap.to('.wipe-overlay-exit', {
+      x: '0%',
+      duration: 0.9,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        router.push('/');
+      }
+    });
+  }, [isWiping, router]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Backspace' || e.key === 'Escape') {
+        handleBack(e);
+      }
+      if (e.key === 'ArrowDown' || e.key === 's') {
+        setSelectedProject((prev) => (prev + 1) % projects.length);
+      }
+      if (e.key === 'ArrowUp' || e.key === 'w') {
+        setSelectedProject((prev) => (prev - 1 + projects.length) % projects.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleBack]);
 
   useGSAP(() => {
     if (!pageRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.bg-persona', { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 1 })
+    tl.fromTo('.wipe-overlay-entrance',
+      { x: '0%' },
+      { x: '100%', duration: 1.1, ease: 'power3.inOut' }
+    )
       .fromTo('.projects-header', { x: -200, y: -50, opacity: 0, rotation: -15 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)' }, '-=0.4')
       .fromTo('.project-item', { x: -200, opacity: 0, skewX: 20 }, { x: 0, opacity: 1, skewX: -4, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, '-=0.3')
       .fromTo('.project-detail', { x: 200, opacity: 0, skewX: -10 }, { x: 0, opacity: 1, skewX: 2, duration: 0.6, ease: 'back.out(1.2)' }, '-=0.4');
   }, { scope: pageRef });
+
+  useEffect(() => {
+    const el = document.getElementById(`project-${selectedProject}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [selectedProject]);
 
   const current = projects[selectedProject];
 
@@ -77,6 +127,7 @@ export default function ProjectsPage() {
           src="/img/WEBP/Projects-persona 5.webp"
           alt="Projects"
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="object-contain object-top object-left drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]"
           priority
         />
@@ -85,12 +136,20 @@ export default function ProjectsPage() {
       <div className="absolute top-[25%] md:top-[30%] left-[5%] right-[5%] bottom-[10%] z-20 flex flex-col md:flex-row gap-8 md:gap-16">
         
         {/* Project List */}
-        <div className="flex flex-col gap-4 w-full md:w-[450px] shrink-0 overflow-y-auto pr-4 custom-scrollbar">
+        <div className="flex flex-col h-full w-full md:w-[450px] shrink-0">
+          {/* Keyboard Hint */}
+          <div className="hidden md:flex items-center gap-2 mb-4 ml-2">
+            <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 border border-white/40">↑↓ / W S</span>
+            <span className="text-white/80 font-bold text-xs uppercase tracking-widest">Select Project</span>
+          </div>
+
+          <div className="flex flex-col gap-4 overflow-y-auto overflow-x-hidden pr-4 custom-scrollbar pb-10">
           {projects.map((project, idx) => {
             const isActive = selectedProject === idx;
             return (
               <motion.div
                 key={project.title}
+                id={`project-${idx}`}
                 className="project-item cursor-pointer group clickable"
                 onClick={() => setSelectedProject(idx)}
                 whileHover={{ x: 15 }}
@@ -140,6 +199,7 @@ export default function ProjectsPage() {
               </motion.div>
             );
           })}
+          </div>
         </div>
 
         {/* Project Detail Panel */}
@@ -149,7 +209,7 @@ export default function ProjectsPage() {
             initial={{ opacity: 0, x: 100, skewX: 10, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, skewX: 2, scale: 1 }}
             exit={{ opacity: 0, x: -100, scale: 0.9 }}
-            transition={{ duration: 0.4, ease: "back.out(1.2)" }}
+            transition={{ duration: 0.4, ease: "backOut" }}
             className="project-detail flex-1 pointer-events-auto flex items-center"
           >
             <div className="bg-black border-[6px] border-white p-8 md:p-12 w-full transform skew-x-[2deg] hard-shadow relative">
@@ -198,18 +258,45 @@ export default function ProjectsPage() {
       </div>
 
       {/* Back Button */}
-      <Link href="/" className="fixed bottom-6 left-[50%] -translate-x-1/2 md:left-6 md:translate-x-0 z-50 group">
+      <Link 
+        href="/" 
+        onClick={handleBack} 
+        onMouseEnter={() => hoverSound?.play()}
+        className="fixed bottom-6 left-[50%] -translate-x-1/2 md:left-6 md:translate-x-0 z-50 group"
+      >
         <motion.div 
           className="flex items-center gap-2 bg-black/90 border-2 border-white px-5 py-2 transform skew-x-[-10deg] hard-shadow hover:bg-[var(--color-primary)] transition-colors clickable"
           whileHover={{ x: -5, scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <div className="transform skew-x-[10deg] flex items-center gap-2">
-            <span className="text-white font-black text-xl">◀</span>
-            <span className="text-white font-bold text-sm md:text-base uppercase tracking-widest persona-heading">BACK TO MENU</span>
+          <div className="transform skew-x-[10deg] flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-white font-black text-xl">◀</span>
+              <span className="text-white font-bold text-sm md:text-base uppercase tracking-widest persona-heading">BACK TO MENU</span>
+            </div>
+            {/* Keyboard Hint */}
+            <div className="hidden md:flex gap-1 ml-2 text-white text-[10px] font-black uppercase tracking-wider">
+              <span className="bg-white/20 px-2 py-0.5 border border-white/40">BACKSPACE</span>
+            </div>
           </div>
         </motion.div>
       </Link>
+
+      {/* Wipe Overlay Entrance */}
+      <div 
+        className="wipe-overlay-entrance fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
+        style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
+      >
+        <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
+      </div>
+
+      {/* Wipe Overlay Exit */}
+      <div 
+        className="wipe-overlay-exit fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
+        style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
+      >
+        <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
+      </div>
 
       {/* Scanline */}
       <div className="absolute inset-0 z-40 pointer-events-none" style={{

@@ -194,7 +194,7 @@ export default function AboutPage() {
       </div>
 
       {/* Bio Box */}
-      <div className="absolute top-[22%] md:top-[28%] left-[5%] z-30 bio-box pointer-events-auto w-[90%] md:w-[650px]">
+      <div className="absolute top-1/2 -translate-y-1/2 left-[5%] z-30 bio-box pointer-events-auto w-[90%] md:w-[650px]">
         <div className="bg-black border-[4px] border-white px-6 md:px-8 py-6 transform skew-x-[-4deg] hard-shadow relative">
           <div className="absolute inset-0 stripes-overlay opacity-20 pointer-events-none" />
           <div className="transform skew-x-[4deg] flex flex-col gap-6">

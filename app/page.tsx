@@ -110,6 +110,21 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
   const [isWiping, setIsWiping] = useState(false);
   const lastQuoteIndex = useRef<number>(-1);
 
+  // Check touch device to disable default hover states
+  const checkTouch = () => {
+    return typeof window !== 'undefined' && (
+      ('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0) ||
+      (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+    );
+  };
+
+  useEffect(() => {
+    if (checkTouch()) {
+      setActiveIndex(-1); // Remove default selection arrow on mobile
+    }
+  }, []);
+
   const characterQuotes = [
     "Take your time...",
     "Lagi males ngoding, Besok aja...",
@@ -193,7 +208,9 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
         hoverSound?.play();
         setActiveIndex(prev => (prev - 1 + menuItems.length) % menuItems.length);
       } else if (e.key === 'Enter') {
-        handleNavigation(menuItems[activeIndex].href);
+        if (activeIndex >= 0) {
+          handleNavigation(menuItems[activeIndex].href);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -395,15 +412,20 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
               href={item.href}
               className="menu-item block group relative clickable"
               onMouseEnter={() => {
+                if (checkTouch()) return;
                 if (hoveredIndex !== idx) {
                   hoverSound?.play();
                 }
                 setHoveredIndex(idx); 
-                setActiveIndex(idx); 
               }}
-              onMouseLeave={() => setHoveredIndex(null)}
+              onMouseLeave={() => {
+                if (checkTouch()) return;
+                setHoveredIndex(null);
+              }}
               onClick={(e) => {
                 e.preventDefault();
+                setActiveIndex(idx); // Lock active state visually
+                setHoveredIndex(idx); // Ensure it turns red immediately
                 handleNavigation(item.href);
               }}
             >

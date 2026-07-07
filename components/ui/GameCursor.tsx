@@ -8,8 +8,23 @@ export default function GameCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
+    // Detect touch devices reliably
+    const checkTouch = () => {
+      return (
+        ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        // Check for coarse pointer (touch)
+        (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+      );
+    };
+    
+    if (checkTouch()) {
+      setIsTouchDevice(true);
+      return; // Do not attach mouse listeners if it's a touch device
+    }
     const moveCursor = (e: MouseEvent) => {
       if (!hasMoved) setHasMoved(true);
       if (cursorRef.current) {
@@ -38,6 +53,8 @@ export default function GameCursor() {
       window.removeEventListener('mouseover', handleMouseOver);
     };
   }, [hasMoved]);
+
+  if (isTouchDevice) return null;
 
   return (
     <>

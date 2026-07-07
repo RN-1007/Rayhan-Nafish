@@ -11,6 +11,7 @@ export default function BackgroundMusic() {
   const [sfxVolume, setSfxVolume] = useState(0.5);
   const [showSettings, setShowSettings] = useState(false);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   const soundRef = useRef<Howl | null>(null);
   const pathname = usePathname();
@@ -32,6 +33,11 @@ export default function BackgroundMusic() {
   }, [showSettings]);
 
   useEffect(() => {
+    // Artificial preloader delay to ensure heavy images/fonts load behind the overlay
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 2500); // 2.5 seconds delay
+
     soundRef.current = new Howl({
       src: ['/sounds/jamiroquai-cosmic-girl.mp3'],
       loop: true,
@@ -42,6 +48,7 @@ export default function BackgroundMusic() {
 
     // Cleanup
     return () => {
+      clearTimeout(timer);
       soundRef.current?.unload();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,8 +103,8 @@ export default function BackgroundMusic() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[90] bg-black flex flex-col items-center justify-center cursor-pointer"
-            onClick={handleStart}
+            className={`fixed inset-0 z-[90] bg-black flex flex-col items-center justify-center ${isReady ? 'cursor-pointer' : 'cursor-wait'}`}
+            onClick={isReady ? handleStart : undefined}
           >
             <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
             <motion.div
@@ -110,7 +117,7 @@ export default function BackgroundMusic() {
               </h1>
             </motion.div>
             <p className="text-white mt-8 font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10 animate-pulse">
-              [ CLICK TO CONTINUE ]
+              {isReady ? '[ CLICK TO CONTINUE ]' : 'LOADING ASSETS...'}
             </p>
           </motion.div>
         )}

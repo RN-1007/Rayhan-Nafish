@@ -111,7 +111,7 @@ export default function ProjectsPage() {
   const current = projects[selectedProject];
 
   return (
-    <div ref={pageRef} className="fixed inset-0 bg-black overflow-hidden">
+    <div ref={pageRef} className="absolute inset-0 bg-black overflow-hidden">
       <CalendarWidget position="top-right" />
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-persona">
@@ -288,7 +288,7 @@ export default function ProjectsPage() {
 
       {/* Wipe Overlay Entrance */}
       <div
-        className="wipe-overlay-entrance fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
+        className="wipe-overlay-entrance absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
@@ -296,7 +296,7 @@ export default function ProjectsPage() {
 
       {/* Wipe Overlay Exit */}
       <div
-        className="wipe-overlay-exit fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
+        className="wipe-overlay-exit absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />

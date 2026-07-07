@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 export default function MobileLandscapeScaler({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,19 +23,15 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
       if (isMobileDevice) {
         setIsMobile(true);
         
-        // Detect portrait based on window dimensions to respond to rotation
+        // Detect portrait based on scaled window dimensions to respond to rotation
         if (window.innerHeight > window.innerWidth) {
           setIsPortrait(true);
-          // Revert to normal mobile viewport so the warning text looks normal size
           let meta = document.querySelector('meta[name="viewport"]');
           if (meta) {
             meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
           }
         } else {
           setIsPortrait(false);
-          // Force Desktop Viewport for Landscape Mobile!
-          // This makes the mobile browser pretend it's a 1280px laptop, perfectly executing
-          // all desktop Tailwind classes (md:, lg:), and calculating 100vw/100vh accurately.
           let meta = document.querySelector('meta[name="viewport"]');
           if (meta) {
             meta.setAttribute('content', 'width=1280, user-scalable=no');
@@ -44,7 +41,6 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
         // Normal Desktop
         setIsMobile(false);
         setIsPortrait(false);
-        // Ensure standard viewport
         let meta = document.querySelector('meta[name="viewport"]');
         if (meta) {
           meta.setAttribute('content', 'width=device-width, initial-scale=1');
@@ -52,14 +48,20 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
       }
     };
 
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
     handleResize();
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
 
@@ -87,7 +89,39 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
     );
   }
 
-  // 2. If desktop OR (mobile and landscape), render children normally without any scaled wrappers!
-  // The viewport meta tag handles the native scaling for us perfectly.
-  return <>{children}</>;
+  // 2. If mobile and landscape AND FULLSCREEN, force CSS scaling because Fullscreen bypasses Viewport Injection
+  if (isMobile && !isPortrait && isFullscreen && typeof window !== 'undefined') {
+    const physicalWidth = window.screen.width;
+    const physicalHeight = window.screen.height;
+    // In landscape, max is width, min is height
+    const w = Math.max(physicalWidth, physicalHeight);
+    const h = Math.min(physicalWidth, physicalHeight);
+    
+    // We want the layout to ALWAYS be 1280px wide.
+    const virtualWidth = 1280;
+    // Calculate the exact virtual height needed to perfectly fill the screen without black bars!
+    const virtualHeight = virtualWidth * (h / w);
+    
+    // Scale factor to shrink the virtual layout down to the physical pixels
+    const scale = w / virtualWidth;
+
+    return (
+      <div className="fixed inset-0 bg-black overflow-hidden pointer-events-none">
+        <div 
+          className="absolute top-0 left-0 origin-top-left bg-black pointer-events-auto"
+          style={{ 
+            width: `${virtualWidth}px`, 
+            height: `${virtualHeight}px`,
+            transform: `scale(${scale})`,
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  // 3. If desktop OR (mobile and landscape but NOT fullscreen), render children normally.
+  // The viewport meta tag handles the native scaling for us perfectly when not in fullscreen.
+  return <div className="absolute inset-0">{children}</div>;
 }

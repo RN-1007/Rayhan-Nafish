@@ -79,7 +79,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div ref={pageRef} className="fixed inset-0 bg-black overflow-hidden">
+    <div ref={pageRef} className="absolute inset-0 bg-black overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-persona">
         <Image
@@ -183,7 +183,7 @@ export default function ContactPage() {
       </div>
 
       {/* Right Column: Character & Calling Card */}
-      <div className="absolute bottom-0 right-[-10%] md:right-[0%] w-[650px] md:w-[900px] h-[95vh] md:h-[105vh] z-10 character-contact pointer-events-none">
+      <div className="absolute bottom-0 right-[-10%] md:right-[0%] w-[650px] md:w-[900px] h-[95%] md:h-[105%] z-10 character-contact pointer-events-none">
         <Image
           src="/img/WEBP/Karakter Rayhan 2 - persona 5.webp"
           alt="Rayhan"
@@ -237,7 +237,7 @@ export default function ContactPage() {
 
       {/* Wipe Overlay Entrance */}
       <div
-        className="wipe-overlay-entrance fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
+        className="wipe-overlay-entrance absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
@@ -245,7 +245,7 @@ export default function ContactPage() {
 
       {/* Wipe Overlay Exit */}
       <div
-        className="wipe-overlay-exit fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
+        className="wipe-overlay-exit absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />

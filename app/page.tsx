@@ -228,7 +228,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
   return (
     <div
       ref={mainRef}
-      className="fixed inset-0 bg-black overflow-hidden focus:outline-none"
+      className="absolute inset-0 bg-black overflow-hidden focus:outline-none"
       tabIndex={0}
     >
       <CalendarWidget />
@@ -282,7 +282,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
       </div>
 
       {/* Character (Joker/Rayhan) - Placed Center */}
-      <div className="absolute bottom-0 left-[35%] md:left-[50%] w-[700px] md:w-[950px] h-[90vh] md:h-[100vh] z-20 character-art pointer-events-none -translate-x-1/2">
+      <div className="absolute bottom-0 left-[35%] md:left-[50%] w-[700px] md:w-[950px] h-[90%] md:h-[100%] z-20 character-art pointer-events-none -translate-x-1/2">
         <Image
           src="/img/WEBP/karakter Rayhan-persona 5.webp"
           alt="Rayhan Nafish"
@@ -513,7 +513,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
 
       {/* Wipe Overlay Entrance */}
       <div 
-        className="wipe-overlay-entrance fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
+        className="wipe-overlay-entrance absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
@@ -521,7 +521,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
 
       {/* Wipe Overlay Exit */}
       <div 
-        className="wipe-overlay fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
+        className="wipe-overlay absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />

@@ -167,7 +167,7 @@ export default function BackgroundMusic() {
             />
             <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
             <motion.div
-              className="bg-[var(--color-primary)] border-[5px] border-white px-10 py-6 transform skew-x-[-10deg] hard-shadow-white relative z-10"
+              className="bg-[var(--color-primary)] border-[5px] border-white px-10 py-6 transform skew-x-[-10deg] hard-shadow-white relative z-10 mx-4"
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
             >

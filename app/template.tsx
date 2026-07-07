@@ -45,16 +45,16 @@ export default function Template({ children }: { children: React.ReactNode }) {
       {/* Red Wipe */}
       <div
         ref={wipeRef}
-        className="fixed inset-0 z-[100] bg-[var(--color-primary)] pointer-events-none origin-left"
+        className="absolute inset-0 z-[100] bg-[var(--color-primary)] pointer-events-none origin-left"
       />
 
       {/* White Flash */}
       <div
         ref={flashRef}
-        className="fixed inset-0 z-[110] bg-white pointer-events-none"
+        className="absolute inset-0 z-[110] bg-white pointer-events-none"
       />
 
-      <div ref={container} className="relative w-full h-full min-h-screen">
+      <div ref={container} className="relative w-full h-full">
         {children}
       </div>
     </>

@@ -12,6 +12,8 @@ import { Howl } from 'howler';
 const hoverSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/hover.mp3'], volume: 0.5 }) : null;
 const backSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/back.mp3'], volume: 0.8 }) : null;
 
+import CalendarWidget from '@/components/CalendarWidget';
+
 const projects = [
   {
     title: 'Personal Website',
@@ -55,7 +57,7 @@ export default function ProjectsPage() {
     if (e) e.preventDefault();
     if (isWiping) return;
     setIsWiping(true);
-    
+
     backSound?.play();
 
     gsap.to('.wipe-overlay-exit', {
@@ -75,9 +77,11 @@ export default function ProjectsPage() {
       }
       if (e.key === 'ArrowDown' || e.key === 's') {
         setSelectedProject((prev) => (prev + 1) % projects.length);
+        hoverSound?.play();
       }
       if (e.key === 'ArrowUp' || e.key === 'w') {
         setSelectedProject((prev) => (prev - 1 + projects.length) % projects.length);
+        hoverSound?.play();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -108,6 +112,7 @@ export default function ProjectsPage() {
 
   return (
     <div ref={pageRef} className="fixed inset-0 bg-black overflow-hidden">
+      <CalendarWidget position="top-right" />
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-persona">
         <Image
@@ -122,7 +127,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Top Left: Projects Header Image */}
-      <div className="absolute top-[2%] left-[2%] z-30 projects-header pointer-events-none w-[350px] md:w-[500px] h-[150px] md:h-[220px]">
+      <div className="absolute top-[2%] left-[-2%] z-30 projects-header pointer-events-none w-[350px] md:w-[500px] h-[150px] md:h-[220px]">
         <Image
           src="/img/WEBP/Projects-persona 5.webp"
           alt="Projects"
@@ -134,7 +139,7 @@ export default function ProjectsPage() {
       </div>
 
       <div className="absolute top-[25%] md:top-[30%] left-[5%] right-[5%] bottom-[10%] z-20 flex flex-col md:flex-row gap-8 md:gap-16">
-        
+
         {/* Project List */}
         <div className="flex flex-col h-full w-full md:w-[450px] shrink-0">
           {/* Keyboard Hint */}
@@ -144,61 +149,61 @@ export default function ProjectsPage() {
           </div>
 
           <div className="flex flex-col gap-4 overflow-y-auto overflow-x-hidden pr-4 custom-scrollbar pb-10">
-          {projects.map((project, idx) => {
-            const isActive = selectedProject === idx;
-            return (
-              <motion.div
-                key={project.title}
-                id={`project-${idx}`}
-                className="project-item cursor-pointer group clickable"
-                onClick={() => setSelectedProject(idx)}
-                whileHover={{ x: 15 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className={`
+            {projects.map((project, idx) => {
+              const isActive = selectedProject === idx;
+              return (
+                <motion.div
+                  key={project.title}
+                  id={`project-${idx}`}
+                  className="project-item cursor-pointer group clickable"
+                  onMouseEnter={() => hoverSound?.play()}
+                  onClick={() => setSelectedProject(idx)}
+                  whileHover={{ x: 15 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className={`
                   flex items-center gap-4 px-6 py-4 border-[3px] transform skew-x-[-4deg] relative overflow-hidden hard-shadow transition-all duration-300
-                  ${isActive 
-                    ? 'bg-black border-[var(--color-primary)]'
-                    : 'bg-black/80 border-white/40 hover:border-white'
-                  }
+                  ${isActive
+                      ? 'bg-black border-[var(--color-primary)]'
+                      : 'bg-black/80 border-white/40 hover:border-white'
+                    }
                 `}>
-                  {/* Stripes inside active */}
-                  {isActive && <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />}
-                  
-                  <div className="transform skew-x-[4deg] flex items-center gap-4 w-full relative z-10">
-                    {/* Index */}
-                    <span className={`persona-heading text-3xl w-10 shrink-0 drop-shadow-[2px_2px_0_rgba(255,255,255,0.3)] ${isActive ? 'text-[var(--color-primary)]' : 'text-white/50'}`}>
-                      {String(idx + 1).padStart(2, '0')}
-                    </span>
-                    
-                    {/* Title */}
-                    <div className="flex-1">
-                      <h3 className={`font-bold text-lg md:text-xl uppercase tracking-wider ${isActive ? 'text-white' : 'text-white/80'}`}>{project.title}</h3>
-                      <span className={`text-xs font-black uppercase tracking-[0.2em] ${
-                        project.status === 'COMPLETED' ? 'text-green-500' : 'text-yellow-500'
-                      }`}>
-                        {project.status}
-                      </span>
-                    </div>
+                    {/* Stripes inside active */}
+                    {isActive && <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />}
 
-                    {/* Arrow Indicator */}
-                    <AnimatePresence>
-                      {isActive && (
-                        <motion.span 
-                          initial={{ opacity: 0, x: -20, scale: 0.5 }}
-                          animate={{ opacity: 1, x: 0, scale: 1 }}
-                          exit={{ opacity: 0, x: -10, scale: 0.5 }}
-                          className="text-[var(--color-primary)] font-black text-2xl md:text-3xl drop-shadow-[0_0_10px_rgba(214,0,28,0.8)]"
-                        >
-                          ▶
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
+                    <div className="transform skew-x-[4deg] flex items-center gap-4 w-full relative z-10">
+                      {/* Index */}
+                      <span className={`persona-heading text-3xl w-10 shrink-0 drop-shadow-[2px_2px_0_rgba(255,255,255,0.3)] ${isActive ? 'text-[var(--color-primary)]' : 'text-white/50'}`}>
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+
+                      {/* Title */}
+                      <div className="flex-1">
+                        <h3 className={`font-bold text-lg md:text-xl uppercase tracking-wider ${isActive ? 'text-white' : 'text-white/80'}`}>{project.title}</h3>
+                        <span className={`text-xs font-black uppercase tracking-[0.2em] ${project.status === 'COMPLETED' ? 'text-green-500' : 'text-yellow-500'
+                          }`}>
+                          {project.status}
+                        </span>
+                      </div>
+
+                      {/* Arrow Indicator */}
+                      <AnimatePresence>
+                        {isActive && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -20, scale: 0.5 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -10, scale: 0.5 }}
+                            className="text-[var(--color-primary)] font-black text-2xl md:text-3xl drop-shadow-[0_0_10px_rgba(214,0,28,0.8)]"
+                          >
+                            ▶
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
@@ -216,16 +221,15 @@ export default function ProjectsPage() {
               {/* Corner decor */}
               <div className="absolute -top-8 -right-8 w-32 h-32 bg-[var(--color-primary)] rotate-45 opacity-20 pointer-events-none" />
               <div className="absolute inset-0 halftone-bg opacity-30 pointer-events-none" />
-              
+
               <div className="transform skew-x-[-2deg] relative z-10 flex flex-col h-full justify-center">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                   <h2 className="persona-heading text-5xl md:text-6xl text-white drop-shadow-[3px_3px_0_rgba(214,0,28,1)]">{current.title}</h2>
-                  
-                  <span className={`px-4 py-1 text-sm font-black uppercase tracking-widest border-[3px] transform -rotate-2 ${
-                    current.status === 'COMPLETED' 
-                      ? 'border-green-500 text-green-500 hard-shadow-green' 
+
+                  <span className={`px-4 py-1 text-sm font-black uppercase tracking-widest border-[3px] transform -rotate-2 ${current.status === 'COMPLETED'
+                      ? 'border-green-500 text-green-500 hard-shadow-green'
                       : 'border-yellow-500 text-yellow-500 hard-shadow-yellow'
-                  }`}>
+                    }`}>
                     {current.status}
                   </span>
                 </div>
@@ -242,7 +246,7 @@ export default function ProjectsPage() {
                   ))}
                 </div>
 
-                <motion.button 
+                <motion.button
                   className="self-start bg-[var(--color-primary)] text-white font-black text-lg px-8 py-4 uppercase tracking-widest border-[3px] border-white transform skew-x-[-10deg] hard-shadow clickable hover:bg-white hover:text-black transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -258,13 +262,13 @@ export default function ProjectsPage() {
       </div>
 
       {/* Back Button */}
-      <Link 
-        href="/" 
-        onClick={handleBack} 
+      <Link
+        href="/"
+        onClick={handleBack}
         onMouseEnter={() => hoverSound?.play()}
         className="fixed bottom-6 left-[50%] -translate-x-1/2 md:left-6 md:translate-x-0 z-50 group"
       >
-        <motion.div 
+        <motion.div
           className="flex items-center gap-2 bg-black/90 border-2 border-white px-5 py-2 transform skew-x-[-10deg] hard-shadow hover:bg-[var(--color-primary)] transition-colors clickable"
           whileHover={{ x: -5, scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -283,7 +287,7 @@ export default function ProjectsPage() {
       </Link>
 
       {/* Wipe Overlay Entrance */}
-      <div 
+      <div
         className="wipe-overlay-entrance fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
@@ -291,7 +295,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Wipe Overlay Exit */}
-      <div 
+      <div
         className="wipe-overlay-exit fixed top-0 bottom-0 left-[-50vw] w-[150vw] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >

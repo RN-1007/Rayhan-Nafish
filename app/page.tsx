@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { Howl } from 'howler';
+import CalendarWidget from '@/components/CalendarWidget';
 
 /* ─── SOUND EFFECTS ─── */
 const hoverSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/hover.mp3'], volume: 0.5 }) : null;
@@ -63,7 +64,7 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
       </div>
 
       <motion.div
-        className="relative z-10 w-[280px] h-[200px] md:w-[420px] md:h-[300px]"
+        className="relative z-10 w-[280px] h-[200px] md:w-[420px] md:h-[300px] will-change-transform transform-gpu"
         animate={{
           rotate: [0, -4, 4, -2, 0],
           scale: [1, 1.05, 1, 1.03, 1],
@@ -213,6 +214,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
       className="fixed inset-0 bg-black overflow-hidden focus:outline-none"
       tabIndex={0}
     >
+      <CalendarWidget />
 
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-persona">
@@ -226,6 +228,39 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
         />
         <div className="absolute inset-0 halftone-bg opacity-30" />
         <div className="absolute inset-0 ink-noise opacity-40" />
+      </div>
+
+      {/* Middle/Center Decoration (Persona 5 Vibe) */}
+      <div className="absolute inset-0 pointer-events-none z-[5] overflow-hidden">
+        {/* Giant Rotating Logo Watermark */}
+        <motion.div
+          className="absolute left-[30%] top-[20%] opacity-[0.07] mix-blend-overlay will-change-transform transform-gpu"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
+        >
+          <div className="w-[1000px] h-[1000px] relative">
+             <Image src="/img/SVG/LOGO RN (FIX).svg" alt="RN Logo Watermark" fill className="object-contain" />
+          </div>
+        </motion.div>
+
+        {/* Diagonal Scrolling Marquee Tape */}
+        <div className="absolute top-[60%] md:top-[50%] left-[-20%] w-[150%] h-[80px] md:h-[100px] bg-black/90 border-y-[6px] border-[var(--color-primary)] transform -rotate-[10deg] -translate-y-1/2 flex items-center overflow-hidden hard-shadow-red shadow-2xl">
+          <div className="absolute inset-0 stripes-overlay opacity-40" />
+          <motion.div 
+            className="flex whitespace-nowrap items-center h-full relative z-10 will-change-transform transform-gpu"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          >
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-center h-full">
+                <span className="persona-heading text-5xl md:text-6xl text-white mx-8 drop-shadow-[4px_4px_0_rgba(214,0,28,1)]">LET'S MAKE A DEAL</span>
+                <span className="text-3xl md:text-4xl text-[var(--color-primary)] mx-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">★</span>
+                <span className="persona-heading text-5xl md:text-6xl text-white mx-8 drop-shadow-[4px_4px_0_rgba(214,0,28,1)]">TAKE YOUR TIME</span>
+                <span className="text-3xl md:text-4xl text-[var(--color-primary)] mx-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">★</span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
       </div>
 
       {/* Character (Joker/Rayhan) - Placed Center */}
@@ -285,7 +320,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
         <motion.div
           animate={{ y: [0, -8, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="relative w-full h-full"
+          className="relative w-full h-full will-change-transform transform-gpu"
         >
           <Image
             src="/img/WEBP/RAYHAN NAFISH-persona 5.webp"
@@ -326,6 +361,21 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
               <span className="text-white/90 font-semibold text-base md:text-lg">Aspiring Fullstack Developer<br />and Project Manager</span>
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Decorative Solid RN Logo - Bottom Right (Static) */}
+      <div 
+        className="absolute bottom-6 right-6 md:bottom-10 md:right-10 z-50 pointer-events-none hidden md:block"
+      >
+        <div className="relative w-24 h-24 md:w-28 md:h-28">
+          <Image 
+            src="/img/SVG/LOGO RN (FIX).svg" 
+            alt="RN Logo Solid" 
+            fill 
+            sizes="(max-width: 768px) 96px, 112px" 
+            className="object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]" 
+          />
         </div>
       </div>
 
@@ -413,19 +463,29 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
         })}
       </div>
 
-      {/* Bottom Left Hint */}
-      <div className="absolute bottom-6 left-6 z-40 flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6 animate-pulse-glow">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-          </svg>
-          <span className="text-white font-bold text-sm tracking-wide">Choose an option.</span>
+      {/* Bottom Left Navigation Hint */}
+      <motion.div 
+        className="absolute bottom-6 left-4 md:bottom-8 md:left-8 z-40 pointer-events-none"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1.2, duration: 0.5 }}
+      >
+        <div className="bg-black border-[3px] border-white px-3 py-1.5 md:px-5 md:py-2 flex items-center gap-3 transform skew-x-[-5deg] hard-shadow-white">
+          <div className="absolute inset-0 stripes-overlay opacity-20" />
+          
+          <div className="flex items-center gap-2 relative z-10">
+            <span className="text-[var(--color-primary)] font-black text-xl md:text-2xl animate-pulse">!</span>
+            <span className="persona-heading text-white text-sm md:text-base tracking-widest mt-1 drop-shadow-md">NAVIGATE</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 md:gap-2 relative z-10 font-black text-black text-[10px] md:text-xs ml-2 md:ml-4">
+            <span className="bg-[var(--color-primary)] text-white px-2 py-0.5 border-2 border-white transform skew-x-[5deg] hard-shadow">W S</span>
+            <span className="text-white text-sm">/</span>
+            <span className="bg-[var(--color-primary)] text-white px-2 py-0.5 border-2 border-white transform skew-x-[5deg] hard-shadow">↑ ↓</span>
+            <span className="bg-white text-black px-2 py-0.5 ml-1 md:ml-2 border-2 border-black transform skew-x-[5deg] uppercase hard-shadow">ENTER ↵</span>
+          </div>
         </div>
-        <div className="flex gap-1 text-white text-xs font-black uppercase ml-4">
-          <span className="bg-white/20 px-2 py-1 border border-white/40">↑↓</span>
-          <span className="bg-white/20 px-2 py-1 border border-white/40">ENTER</span>
-        </div>
-      </div>
+      </motion.div>
 
       {/* Wipe Overlay Entrance */}
       <div 

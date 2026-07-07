@@ -3,7 +3,6 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import GameCursor from '@/components/ui/GameCursor';
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const container = useRef<HTMLDivElement>(null);
@@ -42,7 +41,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, { scope: container });
 
   return (
-    <div ref={container} className="relative w-full h-full min-h-screen">
+    <>
       {/* Red Wipe */}
       <div
         ref={wipeRef}
@@ -55,8 +54,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
         className="fixed inset-0 z-[110] bg-white pointer-events-none"
       />
 
-      <GameCursor />
-      {children}
-    </div>
+      <div ref={container} className="relative w-full h-full min-h-screen">
+        {children}
+      </div>
+    </>
   );
 }

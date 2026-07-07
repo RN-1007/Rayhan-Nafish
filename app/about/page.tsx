@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { Howl } from 'howler';
@@ -12,16 +12,36 @@ import { Howl } from 'howler';
 const hoverSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/hover.mp3'], volume: 0.5 }) : null;
 const backSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/back.mp3'], volume: 0.8 }) : null;
 
+import CalendarWidget from '@/components/CalendarWidget';
+
 export default function AboutPage() {
   const pageRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [isWiping, setIsWiping] = useState(false);
+  const [bubbleText, setBubbleText] = useState("");
+  const [showBubble, setShowBubble] = useState(false);
+
+  const bubblePhrases = [
+    "hehe",
+    "capek jir",
+    "iri? bilang bos"
+  ];
+
+  const handleCharacterClick = () => {
+    const randomText = bubblePhrases[Math.floor(Math.random() * bubblePhrases.length)];
+    setBubbleText(randomText);
+    setShowBubble(true);
+
+    setTimeout(() => {
+      setShowBubble(false);
+    }, 3000);
+  };
 
   const handleBack = useCallback((e?: React.MouseEvent | KeyboardEvent) => {
     if (e) e.preventDefault();
     if (isWiping) return;
     setIsWiping(true);
-    
+
     backSound?.play();
 
     gsap.to('.wipe-overlay-exit', {
@@ -111,6 +131,7 @@ export default function AboutPage() {
 
   return (
     <div ref={pageRef} className="fixed inset-0 bg-black overflow-hidden">
+      <CalendarWidget position="top-right" />
 
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-persona">
@@ -127,13 +148,36 @@ export default function AboutPage() {
 
       {/* Character */}
       <div className="absolute bottom-0 right-[-5%] md:right-[0%] w-[700px] md:w-[900px] h-[95vh] md:h-[100vh] z-10 character-portrait pointer-events-none">
+        
+        {/* Speech Bubble */}
+        <AnimatePresence>
+          {showBubble && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              className="absolute top-[25%] right-[20%] md:top-[30%] md:right-[40%] z-50 pointer-events-auto"
+            >
+              <div className="bg-white border-[4px] border-black px-6 py-4 transform skew-x-[-5deg] hard-shadow relative">
+                <div className="absolute inset-0 stripes-overlay opacity-10" />
+                <p className="persona-heading text-black text-2xl md:text-3xl relative z-10">
+                  {bubbleText}
+                </p>
+                {/* Speech Bubble Tail */}
+                <div className="absolute -bottom-4 right-8 w-6 h-6 bg-white border-b-[4px] border-r-[4px] border-black transform rotate-45" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <Image
           src="/img/WEBP/karakter Rayhan-persona 5.webp"
           alt="Rayhan"
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-contain object-bottom"
+          className="object-contain object-bottom pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02]"
           priority
+          onClick={handleCharacterClick}
         />
       </div>
 
@@ -164,8 +208,7 @@ export default function AboutPage() {
                   <span className="text-[var(--color-primary)] persona-heading tracking-widest">Rayhan Nafish</span>
                 </p>
                 <p className="text-white/90 text-sm md:text-base font-semibold leading-relaxed relative z-10">
-                  A passionate developer who loves turning ideas into impactful digital solutions. My journey is all about pushing boundaries and exploring the unknown.
-                </p>
+                  Fullstack Developer & Project Engineer yang jadiin teknologi kaya playground! Paling excited buat ngulik hal-hal baru and nyulap ide ribet jadi solusi digital yang cool AF.                </p>
               </div>
 
               {/* Radar Chart Inside Card */}
@@ -265,9 +308,9 @@ export default function AboutPage() {
       </div>
 
       {/* Back Button */}
-      <Link 
-        href="/" 
-        onClick={handleBack} 
+      <Link
+        href="/"
+        onClick={handleBack}
         onMouseEnter={() => hoverSound?.play()}
         className="fixed bottom-6 left-[50%] -translate-x-1/2 md:left-6 md:translate-x-0 z-50 group"
       >

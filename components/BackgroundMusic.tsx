@@ -34,22 +34,56 @@ export default function BackgroundMusic() {
   }, [showSettings]);
 
   useEffect(() => {
-    // Artificial preloader delay to ensure heavy images/fonts load behind the overlay
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 2000); // 2.0 seconds delay - Vercel optimization disabled so it's super fast now
+    let isMounted = true;
+    let loadedAssets = 0;
+    
+    // Daftar aset berat yang HARUS didownload sebelum web dibuka
+    const criticalImages = [
+      '/img/WEBP/karakter Rayhan-persona 5.webp',
+      '/img/WEBP/Background-persona 5.webp',
+      '/img/SVG/LOGO RN (FIX) 1.svg',
+      '/img/WEBP/loading_lets go-persona 5.webp'
+    ];
+    
+    const totalAssets = criticalImages.length + 1; // +1 untuk lagu Jamiroquai
 
+    const handleAssetLoaded = () => {
+      if (!isMounted) return;
+      loadedAssets += 1;
+      // Jika semua gambar dan audio sudah sukses terdownload
+      if (loadedAssets >= totalAssets) {
+        setIsReady(true);
+      }
+    };
+
+    // Mulai mendownload semua gambar secara background
+    criticalImages.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+      img.onload = handleAssetLoaded;
+      img.onerror = handleAssetLoaded; // Tetap lanjut jika gagal agar user tidak terjebak selamanya
+    });
+
+    // Mulai mendownload Audio
     soundRef.current = new Howl({
       src: ['/sounds/jamiroquai-cosmic-girl.mp3'],
       loop: true,
       volume: musicVolume,
       html5: true,
+      onload: handleAssetLoaded,
+      onloaderror: handleAssetLoaded,
       // Do NOT autoplay here to respect the overlay. Wait for handleStart.
     });
 
+    // Fallback: Jika setelah 10 detik entah kenapa ada error jaringan, buka saja paksa (UX safety)
+    const fallbackTimer = setTimeout(() => {
+      if (isMounted) setIsReady(true);
+    }, 10000);
+
     // Cleanup
     return () => {
-      clearTimeout(timer);
+      isMounted = false;
+      clearTimeout(fallbackTimer);
       soundRef.current?.unload();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

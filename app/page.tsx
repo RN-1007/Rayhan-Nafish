@@ -239,7 +239,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
           transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
         >
           <div className="w-[1000px] h-[1000px] relative">
-             <Image src="/img/SVG/LOGO RN (FIX).svg" alt="RN Logo Watermark" fill className="object-contain" />
+             <Image src="/img/SVG/LOGO RN (FIX) 1.svg" alt="RN Logo Watermark" fill className="object-contain" />
           </div>
         </motion.div>
 

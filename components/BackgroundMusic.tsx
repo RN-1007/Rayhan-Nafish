@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Howl } from 'howler';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 export default function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -106,6 +107,13 @@ export default function BackgroundMusic() {
             className={`fixed inset-0 z-[90] bg-black flex flex-col items-center justify-center ${isReady ? 'cursor-pointer' : 'cursor-wait'}`}
             onClick={isReady ? handleStart : undefined}
           >
+            <Image 
+              src="/img/WEBP/loading_lets go-persona 5.webp"
+              alt="Loading Background"
+              fill
+              className="object-cover opacity-60 mix-blend-luminosity"
+              priority
+            />
             <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
             <motion.div
               className="bg-[var(--color-primary)] border-[5px] border-white px-10 py-6 transform skew-x-[-10deg] hard-shadow-white relative z-10"
@@ -116,8 +124,12 @@ export default function BackgroundMusic() {
                 USE HEADPHONES FOR<br />BETTER EXPERIENCE
               </h1>
             </motion.div>
-            <p className="text-white mt-8 font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10 animate-pulse">
-              {isReady ? '[ CLICK TO CONTINUE ]' : 'LOADING ASSETS...'}
+            <p className="text-white mt-8 font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10 bg-black/50 px-4 py-2 border-2 border-white">
+              {isReady ? (
+                <span className="animate-pulse">[ CLICK TO CONTINUE ]</span>
+              ) : (
+                <span className="inline-block animate-bounce">LOADING ASSETS...</span>
+              )}
             </p>
           </motion.div>
         )}

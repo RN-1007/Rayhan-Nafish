@@ -94,6 +94,23 @@ export default function BackgroundMusic() {
       soundRef.current?.play();
       setIsPlaying(true);
     }
+
+    // Request fullscreen on mobile/touch devices to hide the address bar
+    try {
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      if (isTouch) {
+        const docEl = document.documentElement as any;
+        const requestFullscreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+        if (requestFullscreen) {
+          requestFullscreen.call(docEl).catch(() => {
+            // Silently ignore if browser blocks it
+          });
+        }
+      }
+    } catch (err) {
+      // Ignore
+    }
+
     setShowOverlay(false);
   };
 

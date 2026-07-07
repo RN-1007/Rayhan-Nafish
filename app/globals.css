@@ -103,6 +103,13 @@
   }
 }
 
+/* Force Hardware Acceleration for Heavy Wipe Animations to stop mobile GPU lag */
+.wipe-overlay-entrance, .wipe-overlay-exit, .wipe-overlay {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 /* Keyframes */
 @keyframes fillBar {
   0% { width: 0%; }

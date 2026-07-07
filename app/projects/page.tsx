@@ -92,11 +92,7 @@ export default function ProjectsPage() {
     if (!pageRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.wipe-overlay-entrance',
-      { x: '0%' },
-      { x: '100%', duration: 1.1, ease: 'power3.inOut' }
-    )
-      .fromTo('.projects-header', { x: -200, y: -50, opacity: 0, rotation: -15 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)' }, '-=0.4')
+    tl.fromTo('.projects-header', { x: -200, y: -50, opacity: 0, rotation: -15 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)', delay: 0.2 })
       .fromTo('.project-item', { x: -200, opacity: 0, skewX: 20 }, { x: 0, opacity: 1, skewX: -4, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, '-=0.3')
       .fromTo('.project-detail', { x: 200, opacity: 0, skewX: -10 }, { x: 0, opacity: 1, skewX: 2, duration: 0.6, ease: 'back.out(1.2)' }, '-=0.4');
   }, { scope: pageRef });
@@ -285,14 +281,6 @@ export default function ProjectsPage() {
           </div>
         </motion.div>
       </Link>
-
-      {/* Wipe Overlay Entrance */}
-      <div
-        className="wipe-overlay-entrance absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
-        style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
-      >
-        <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
-      </div>
 
       {/* Wipe Overlay Exit */}
       <div

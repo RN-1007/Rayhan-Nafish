@@ -68,11 +68,7 @@ export default function AboutPage() {
     if (!pageRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.wipe-overlay-entrance',
-      { x: '0%' },
-      { x: '100%', duration: 1.1, ease: 'power3.inOut' }
-    )
-      .fromTo('.character-portrait',
+    tl.fromTo('.character-portrait',
         { x: '10%', opacity: 0, scale: 0.9 },
         { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)' },
         "-=0.5"
@@ -331,14 +327,6 @@ export default function AboutPage() {
           </div>
         </motion.div>
       </Link>
-
-      {/* Wipe Overlay Entrance */}
-      <div
-        className="wipe-overlay-entrance absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
-        style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
-      >
-        <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
-      </div>
 
       {/* Wipe Overlay Exit */}
       <div

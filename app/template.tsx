@@ -33,10 +33,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
       }
     }, 0.08);
 
-    // Content scales in
+    // Content scales in slightly (without opacity fade so internal wipes are visible)
     gsap.fromTo(container.current,
-      { scale: 1.03, autoAlpha: 0 },
-      { scale: 1, autoAlpha: 1, duration: 0.25, ease: 'power2.out', delay: 0.15 }
+      { scale: 1.03 },
+      { scale: 1, duration: 0.25, ease: 'power2.out', delay: 0.15 }
     );
   }, { scope: container });
 

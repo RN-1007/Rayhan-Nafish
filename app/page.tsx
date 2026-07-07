@@ -152,19 +152,9 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
     if (!mainRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    if (playEntranceWipe) {
-      tl.fromTo('.wipe-overlay-entrance',
-        { x: '0%' },
-        { x: '100%', duration: 1.1, ease: 'power3.inOut' }
-      );
-    } else {
-      gsap.set('.wipe-overlay-entrance', { x: '100%' });
-    }
-
     tl.fromTo('.character-art',
       { x: '10%', opacity: 0, scale: 0.9 },
-      { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)' },
-      playEntranceWipe ? "-=0.4" : "0"
+      { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)', delay: 0.2 }
     )
       .fromTo('.left-text-block',
         { x: -100, opacity: 0, skewX: 20 },
@@ -511,15 +501,6 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
         </div>
       </motion.div>
 
-      {/* Wipe Overlay Entrance */}
-      <div 
-        className="wipe-overlay-entrance absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-0"
-        style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
-      >
-        <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />
-      </div>
-
-      {/* Wipe Overlay Exit */}
       <div 
         className="wipe-overlay absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}

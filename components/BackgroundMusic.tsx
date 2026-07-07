@@ -37,7 +37,7 @@ export default function BackgroundMusic() {
     // Artificial preloader delay to ensure heavy images/fonts load behind the overlay
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 2500); // 2.5 seconds delay
+    }, 2000); // 2.0 seconds delay - Vercel optimization disabled so it's super fast now
 
     soundRef.current = new Howl({
       src: ['/sounds/jamiroquai-cosmic-girl.mp3'],

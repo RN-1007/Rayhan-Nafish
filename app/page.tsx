@@ -225,6 +225,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
           sizes="100vw"
           className="object-cover object-center"
           priority
+          unoptimized
         />
         <div className="absolute inset-0 halftone-bg opacity-30" />
         <div className="absolute inset-0 ink-noise opacity-40" />
@@ -239,7 +240,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
           transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
         >
           <div className="w-[1000px] h-[1000px] relative">
-             <Image src="/img/SVG/LOGO RN (FIX) 1.svg" alt="RN Logo Watermark" fill className="object-contain" />
+             <Image src="/img/SVG/LOGO RN (FIX) 1.svg" alt="RN Logo Watermark" fill className="object-contain" unoptimized />
           </div>
         </motion.div>
 
@@ -272,6 +273,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
           sizes="(max-width: 768px) 100vw, 50vw"
           className={`object-contain object-bottom drop-shadow-2xl transition-transform duration-300 ${isCharacterHovered ? 'scale-[1.02]' : 'scale-100'}`}
           priority
+          unoptimized
         />
 
         {/* Tight Hit-Box for Hover/Click to avoid transparent corners */}

@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Personal Website",
+    "description": "A responsive portfolio website built with modern web tech. Implements aggressive Persona 5 UI designs with GSAP animations.",
+    "tags": ["Next.js", "GSAP", "Tailwind"],
+    "status": "COMPLETED",
+    "link": "https://github.com/rayhannafish"
+  },
+  {
+    "title": "Task Manager App",
+    "description": "A productivity app to manage tasks effectively with real-time sync and high performance backend.",
+    "tags": ["React", "Node.js", "Fullstack"],
+    "status": "COMPLETED",
+    "link": "https://github.com/rayhannafish"
+  },
+  {
+    "title": "Weather Dashboard",
+    "description": "Real-time weather app using OpenWeather API with custom charting and responsive design.",
+    "tags": ["API", "Chart.js", "Tailwind"],
+    "status": "COMPLETED",
+    "link": "https://github.com/rayhannafish"
+  },
+  {
+    "title": "E-Commerce Clone",
+    "description": "Full functioning online store with payment gateways, cart system, and admin dashboard.",
+    "tags": ["Next.js", "Stripe", "Prisma"],
+    "status": "IN PROGRESS",
+    "link": "https://github.com/rayhannafish"
+  },
+  {
+    "title": "Game Engine Tools",
+    "description": "Scripting utilities and map editors for a 2D indie game project.",
+    "tags": ["C++", "Python", "Tools"],
+    "status": "COMPLETED",
+    "link": "https://github.com/rayhannafish"
+  }
+]

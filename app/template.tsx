@@ -18,25 +18,26 @@ export default function Template({ children }: { children: React.ReactNode }) {
     // White flash
     tl.to(flashRef.current, {
       autoAlpha: 0,
-      duration: 0.08,
+      duration: 0.15,
       ease: 'power4.out',
     }, 0);
 
     // Red wipe slides right with sharp trailing edge
+    // Delay slightly (0.2s) to allow Next.js hydration to finish on Android, avoiding CPU bottleneck/frame drops
     tl.to(wipeRef.current, {
       xPercent: 120,
       skewX: -20,
-      duration: 0.45,
+      duration: 0.8,
       ease: 'power3.inOut',
       onComplete: () => {
         gsap.set(wipeRef.current, { autoAlpha: 0 });
       }
-    }, 0.08);
+    }, 0.2);
 
     // Content scales in slightly (without opacity fade so internal wipes are visible)
     gsap.fromTo(container.current,
       { scale: 1.03 },
-      { scale: 1, duration: 0.25, ease: 'power2.out', delay: 0.15 }
+      { scale: 1, duration: 0.4, ease: 'power2.out', delay: 0.3 }
     );
   }, { scope: container });
 

@@ -7,8 +7,10 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
   const [isMobile, setIsMobile] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -64,6 +66,11 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
+
+  // Avoid Hydration Mismatch by returning standard layout on first render
+  if (!isMounted) {
+    return <div className="absolute inset-0">{children}</div>;
+  }
 
   // 1. If mobile and portrait, show rotation warning
   if (isMobile && isPortrait) {
@@ -121,7 +128,43 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
     );
   }
 
-  // 3. If desktop OR (mobile and landscape but NOT fullscreen), render children normally.
-  // The viewport meta tag handles the native scaling for us perfectly when not in fullscreen.
+  // 3. For large desktop monitors or non-standard aspect ratios (ultrawide/square), force CSS scaling
+  // This preserves the exact laptop layout (1280x720 equivalent) on any monitor without breaking.
+  // Standard laptops (width <= 1536 and ~16:9 ratio) will bypass this and render natively!
+  if (!isMobile) {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    
+    const screenW = window.screen.width;
+    const screenH = window.screen.height;
+    const screenRatio = screenW / screenH;
+    
+    // Check physical screen dimensions to avoid triggering on laptops with browser UI
+    const isLargeOrWeirdMonitor = screenW > 2000 || screenRatio > 1.8 || screenRatio < 1.5;
+
+    if (isLargeOrWeirdMonitor) {
+      // Force a strict 16:9 layout just like a game engine
+      const virtualWidth = 1280;
+      const virtualHeight = 720;
+      const scale = Math.min(w / virtualWidth, h / virtualHeight);
+
+      return (
+        <div className="fixed inset-0 bg-black overflow-hidden pointer-events-none">
+          <div 
+            className="absolute top-1/2 left-1/2 bg-black pointer-events-auto"
+            style={{ 
+              width: `${virtualWidth}px`, 
+              height: `${virtualHeight}px`,
+              transform: `translate(-50%, -50%) scale(${scale})`,
+            }}
+          >
+            {children}
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // 4. If standard laptop, render natively.
   return <div className="absolute inset-0">{children}</div>;
 }

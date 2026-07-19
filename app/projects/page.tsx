@@ -11,41 +11,11 @@ import { Howl } from 'howler';
 
 const hoverSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/hover.mp3'], volume: 0.5 }) : null;
 const backSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/back.mp3'], volume: 0.8 }) : null;
+const selectSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/select.mp3'], volume: 0.8 }) : null;
 
 import CalendarWidget from '@/components/CalendarWidget';
 
-const projects = [
-  {
-    title: 'Personal Website',
-    description: 'A responsive portfolio website built with modern web tech. Implements aggressive Persona 5 UI designs with GSAP animations.',
-    tags: ['Next.js', 'GSAP', 'Tailwind'],
-    status: 'COMPLETED',
-  },
-  {
-    title: 'Task Manager App',
-    description: 'A productivity app to manage tasks effectively with real-time sync and high performance backend.',
-    tags: ['React', 'Node.js', 'Fullstack'],
-    status: 'COMPLETED',
-  },
-  {
-    title: 'Weather Dashboard',
-    description: 'Real-time weather app using OpenWeather API with custom charting and responsive design.',
-    tags: ['API', 'Chart.js', 'Tailwind'],
-    status: 'COMPLETED',
-  },
-  {
-    title: 'E-Commerce Clone',
-    description: 'Full functioning online store with payment gateways, cart system, and admin dashboard.',
-    tags: ['Next.js', 'Stripe', 'Prisma'],
-    status: 'IN PROGRESS',
-  },
-  {
-    title: 'Game Engine Tools',
-    description: 'Scripting utilities and map editors for a 2D indie game project.',
-    tags: ['C++', 'Python', 'Tools'],
-    status: 'COMPLETED',
-  },
-];
+import projects from '@/data/projects.json';
 
 export default function ProjectsPage() {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -246,6 +216,12 @@ export default function ProjectsPage() {
                   className="self-start bg-[var(--color-primary)] text-white font-black text-lg px-8 py-4 uppercase tracking-widest border-[3px] border-white transform skew-x-[-10deg] hard-shadow clickable hover:bg-white hover:text-black transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    selectSound?.play();
+                    if (current.link && current.link !== '#') {
+                      window.open(current.link, '_blank');
+                    }
+                  }}
                 >
                   <span className="inline-block transform skew-x-[10deg]">
                     VIEW DETAILS ▶

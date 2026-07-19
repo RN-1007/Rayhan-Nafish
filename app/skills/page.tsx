@@ -32,11 +32,7 @@ const toolsProficiency = [
   { name: 'PostgreSQL', level: 'B' },
 ];
 
-const certificates = [
-  { title: 'Fullstack Web Development', issuer: 'Tech Academy', date: '2023', type: 'Bootcamp' },
-  { title: 'Advanced React Patterns', issuer: 'Frontend Masters', date: '2024', type: 'Course' },
-  { title: 'UI/UX Design Certification', issuer: 'Google / Coursera', date: '2025', type: 'Professional' },
-];
+import certificates from '@/data/certificates.json';
 
 const tabs = [
   { id: 'stats', label: 'COMBAT STATS', sub: 'Technical Abilities' },

@@ -152,26 +152,36 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
     if (!mainRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.character-art',
-      { x: '10%', opacity: 0, scale: 0.9 },
-      { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)', delay: 0.2 }
-    )
-      .fromTo('.left-text-block',
-        { x: -100, opacity: 0, skewX: 20 },
-        { x: 0, opacity: 1, skewX: 0, duration: 0.6, ease: 'power3.out' },
-        "-=0.4"
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      gsap.set(['.character-art', '.left-text-block', '.menu-item'], { opacity: 1, x: 0, scale: 1, skewX: 0 });
+    } else {
+      tl.fromTo('.character-art',
+        { x: '10%', opacity: 0, scale: 0.9 },
+        { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)', delay: 0.2 }
       )
-      .fromTo('.menu-item',
-        { x: 200, opacity: 0, skewX: -10 },
-        { x: 0, opacity: 1, skewX: 0, duration: 0.5, stagger: 0.08, ease: 'back.out(1.2)' },
-        "-=0.4"
-      );
+        .fromTo('.left-text-block',
+          { x: -100, opacity: 0, skewX: 20 },
+          { x: 0, opacity: 1, skewX: 0, duration: 0.6, ease: 'power3.out' },
+          "-=0.4"
+        )
+        .fromTo('.menu-item',
+          { x: 200, opacity: 0, skewX: -10 },
+          { x: 0, opacity: 1, skewX: 0, duration: 0.5, stagger: 0.08, ease: 'back.out(1.2)' },
+          "-=0.4"
+        );
+    }
   }, { scope: mainRef });
 
   const handleNavigation = useCallback((href: string) => {
     if (isWiping) return;
     setIsWiping(true);
     selectSound?.play();
+    
+    // Instantly hide settings button to prevent it overlapping the wipe
+    const settingsPanel = document.getElementById('settings-panel');
+    if (settingsPanel) settingsPanel.style.opacity = '0';
     
     gsap.to('.wipe-overlay', {
       x: '0%',
@@ -211,6 +221,9 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
     if (mainRef.current) {
       mainRef.current.focus();
     }
+    // Restore settings button visibility when returning to Home
+    const settingsPanel = document.getElementById('settings-panel');
+    if (settingsPanel) settingsPanel.style.opacity = '1';
   }, []);
 
   const currentIndex = hoveredIndex !== null ? hoveredIndex : activeIndex;

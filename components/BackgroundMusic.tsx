@@ -187,7 +187,14 @@ export default function BackgroundMusic() {
       </AnimatePresence>
 
       {pathname === '/' && !showOverlay && (
-        <div ref={panelRef} className="fixed top-4 right-4 md:top-8 md:right-8 z-[9999] flex flex-col items-end">
+        <motion.div 
+          id="settings-panel" 
+          ref={panelRef} 
+          className="fixed top-4 right-4 md:top-8 md:right-8 z-[50] flex flex-col items-end"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
           {/* Settings Toggle Button */}
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -259,7 +266,7 @@ export default function BackgroundMusic() {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
       )}
     </>
   );

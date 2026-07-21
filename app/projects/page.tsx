@@ -62,9 +62,15 @@ export default function ProjectsPage() {
     if (!pageRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.projects-header', { x: -200, y: -50, opacity: 0, rotation: -15 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)', delay: 0.2 })
-      .fromTo('.project-item', { x: -200, opacity: 0, skewX: 20 }, { x: 0, opacity: 1, skewX: -4, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, '-=0.3')
-      .fromTo('.project-detail', { x: 200, opacity: 0, skewX: -10 }, { x: 0, opacity: 1, skewX: 2, duration: 0.6, ease: 'back.out(1.2)' }, '-=0.4');
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      gsap.set(['.projects-header', '.project-item', '.project-detail'], { opacity: 1, x: 0, y: 0, skewX: 0, rotation: 0 });
+    } else {
+      tl.fromTo('.projects-header', { x: -200, y: -50, opacity: 0, rotation: -15 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)', delay: 0.2 })
+        .fromTo('.project-item', { x: -200, opacity: 0, skewX: 20 }, { x: 0, opacity: 1, skewX: -4, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, '-=0.3')
+        .fromTo('.project-detail', { x: 200, opacity: 0, skewX: -10 }, { x: 0, opacity: 1, skewX: 2, duration: 0.6, ease: 'back.out(1.2)' }, '-=0.4');
+    }
   }, { scope: pageRef });
 
   useEffect(() => {

@@ -68,36 +68,42 @@ export default function AboutPage() {
     if (!pageRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.character-portrait',
-        { x: '10%', opacity: 0, scale: 0.9 },
-        { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)' },
-        "-=0.5"
-      )
-      .fromTo('.about-header',
-        { x: -100, y: -50, opacity: 0, rotation: -10 },
-        { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)' },
-        "-=0.4"
-      )
-      .fromTo('.bio-box',
-        { x: -100, opacity: 0, skewX: 20 },
-        { x: 0, opacity: 1, skewX: -4, duration: 0.5, ease: 'power3.out' },
-        "-=0.3"
-      )
-      .fromTo('.status-box',
-        { y: 100, opacity: 0, rotation: 10 },
-        { y: 0, opacity: 1, rotation: -2, duration: 0.6, ease: 'back.out(1.2)' },
-        "-=0.2"
-      )
-      .fromTo('.codename-box',
-        { x: 100, opacity: 0, scale: 0.8 },
-        { x: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.5)' },
-        "-=0.2"
-      )
-      .fromTo('.radar-polygon',
-        { scale: 0, opacity: 0, transformOrigin: 'center center' },
-        { scale: 1, opacity: 1, duration: 1, ease: 'elastic.out(1, 0.5)' },
-        "-=0.3"
-      );
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      gsap.set(['.character-portrait', '.about-header', '.bio-box', '.status-box', '.codename-box', '.radar-polygon'], { opacity: 1, x: 0, y: 0, scale: 1, skewX: 0, rotation: 0 });
+    } else {
+      tl.fromTo('.character-portrait',
+          { x: '10%', opacity: 0, scale: 0.9 },
+          { x: '0%', opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.2)' },
+          "-=0.5"
+        )
+        .fromTo('.about-header',
+          { x: -100, y: -50, opacity: 0, rotation: -10 },
+          { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)' },
+          "-=0.4"
+        )
+        .fromTo('.bio-box',
+          { x: -100, opacity: 0, skewX: 20 },
+          { x: 0, opacity: 1, skewX: -4, duration: 0.5, ease: 'power3.out' },
+          "-=0.3"
+        )
+        .fromTo('.status-box',
+          { y: 100, opacity: 0, rotation: 10 },
+          { y: 0, opacity: 1, rotation: -2, duration: 0.6, ease: 'back.out(1.2)' },
+          "-=0.2"
+        )
+        .fromTo('.codename-box',
+          { x: 100, opacity: 0, scale: 0.8 },
+          { x: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.5)' },
+          "-=0.2"
+        )
+        .fromTo('.radar-polygon',
+          { scale: 0, opacity: 0, transformOrigin: 'center center' },
+          { scale: 1, opacity: 1, duration: 1, ease: 'elastic.out(1, 0.5)' },
+          "-=0.3"
+        );
+    }
   }, { scope: pageRef });
 
   const stats = [

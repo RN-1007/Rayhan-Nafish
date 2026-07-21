@@ -56,10 +56,18 @@ export default function ContactPage() {
     if (!pageRef.current) return;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    tl.fromTo('.contact-title', { x: -100, y: -50, opacity: 0, rotation: -10 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)', delay: 0.2 })
-      .fromTo('.contact-item', { x: -100, opacity: 0, skewX: 20 }, { x: 0, opacity: 1, skewX: -4, duration: 0.4, stagger: 0.05, ease: 'power3.out' }, '-=0.3')
-      .fromTo('.character-contact', { x: 100, y: 100, opacity: 0, scale: 0.8 }, { x: 0, y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.2)' }, '-=0.4')
-      .fromTo('.calling-card', { scale: 0, rotation: -40, opacity: 0 }, { scale: 1, rotation: 6, opacity: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.2');
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      gsap.set(['.contact-title', '.character-contact'], { opacity: 1, x: 0, y: 0, scale: 1, skewX: 0, rotation: 0 });
+      gsap.set('.contact-item', { opacity: 1, x: 0, skewX: -4 });
+      gsap.set('.calling-card', { opacity: 1, scale: 1, rotation: 6 });
+    } else {
+      tl.fromTo('.contact-title', { x: -100, y: -50, opacity: 0, rotation: -10 }, { x: 0, y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)', delay: 0.2 })
+        .fromTo('.contact-item', { x: -100, opacity: 0, skewX: 20 }, { x: 0, opacity: 1, skewX: -4, duration: 0.4, stagger: 0.05, ease: 'power3.out' }, '-=0.3')
+        .fromTo('.character-contact', { x: 100, y: 100, opacity: 0, scale: 0.8 }, { x: 0, y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.2)' }, '-=0.4')
+        .fromTo('.calling-card', { scale: 0, rotation: -40, opacity: 0 }, { scale: 1, rotation: 6, opacity: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.2');
+    }
   }, { scope: pageRef });
 
   const handleSendCallingCard = () => {

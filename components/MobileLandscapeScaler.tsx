@@ -24,29 +24,11 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
 
       if (isMobileDevice) {
         setIsMobile(true);
-        
-        // Detect portrait based on scaled window dimensions to respond to rotation
-        if (window.innerHeight > window.innerWidth) {
-          setIsPortrait(true);
-          let meta = document.querySelector('meta[name="viewport"]');
-          if (meta) {
-            meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
-          }
-        } else {
-          setIsPortrait(false);
-          let meta = document.querySelector('meta[name="viewport"]');
-          if (meta) {
-            meta.setAttribute('content', 'width=1280, user-scalable=no');
-          }
-        }
+        setIsPortrait(window.innerHeight > window.innerWidth);
       } else {
         // Normal Desktop
         setIsMobile(false);
         setIsPortrait(false);
-        let meta = document.querySelector('meta[name="viewport"]');
-        if (meta) {
-          meta.setAttribute('content', 'width=device-width, initial-scale=1');
-        }
       }
     };
 
@@ -96,20 +78,17 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
     );
   }
 
-  // 2. If mobile and landscape AND FULLSCREEN, force CSS scaling because Fullscreen bypasses Viewport Injection
-  if (isMobile && !isPortrait && isFullscreen && typeof window !== 'undefined') {
-    const physicalWidth = window.screen.width;
-    const physicalHeight = window.screen.height;
-    // In landscape, max is width, min is height
-    const w = Math.max(physicalWidth, physicalHeight);
-    const h = Math.min(physicalWidth, physicalHeight);
+  // 2. If mobile and landscape, ALWAYS force CSS scaling
+  if (isMobile && !isPortrait && typeof window !== 'undefined') {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
     
     // We want the layout to ALWAYS be 1280px wide.
     const virtualWidth = 1280;
     // Calculate the exact virtual height needed to perfectly fill the screen without black bars!
     const virtualHeight = virtualWidth * (h / w);
     
-    // Scale factor to shrink the virtual layout down to the physical pixels
+    // Scale factor to shrink the virtual layout down to the viewport pixels
     const scale = w / virtualWidth;
 
     return (

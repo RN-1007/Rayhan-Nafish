@@ -7,20 +7,11 @@ import { useGSAP } from '@gsap/react';
 export default function Template({ children }: { children: React.ReactNode }) {
   const container = useRef<HTMLDivElement>(null);
   const wipeRef = useRef<HTMLDivElement>(null);
-  const flashRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     gsap.set(wipeRef.current, { xPercent: 0, skewX: 0 });
-    gsap.set(flashRef.current, { autoAlpha: 1 });
 
     const tl = gsap.timeline();
-
-    // White flash
-    tl.to(flashRef.current, {
-      autoAlpha: 0,
-      duration: 0.15,
-      ease: 'power4.out',
-    }, 0);
 
     // Red wipe slides right with sharp trailing edge
     // Delay slightly (0.2s) to allow Next.js hydration to finish on Android, avoiding CPU bottleneck/frame drops
@@ -47,12 +38,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
       <div
         ref={wipeRef}
         className="absolute inset-0 z-[100] bg-[var(--color-primary)] pointer-events-none origin-left"
-      />
-
-      {/* White Flash */}
-      <div
-        ref={flashRef}
-        className="absolute inset-0 z-[110] bg-white pointer-events-none"
       />
 
       <div ref={container} className="relative w-full h-full">

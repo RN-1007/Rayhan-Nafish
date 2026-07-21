@@ -1,5 +1,14 @@
 [
-  { "title": "Fullstack Web Development", "issuer": "Tech Academy", "date": "2023", "type": "Bootcamp" },
-  { "title": "Advanced React Patterns", "issuer": "Frontend Masters", "date": "2024", "type": "Course" },
-  { "title": "UI/UX Design Certification", "issuer": "Google / Coursera", "date": "2025", "type": "Professional" }
+  {
+    "title": "2nd Place Winner of ExplorAItion 2026",
+    "issuer": "Jagoan Hosting",
+    "date": "2026",
+    "type": "Competition"
+  },
+  {
+    "title": "Workshop Backend Dev",
+    "issuer": "Dunia Coding",
+    "date": "2026",
+    "type": "Workshop"
+  }
 ]

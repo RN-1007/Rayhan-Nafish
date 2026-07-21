@@ -2,36 +2,56 @@
   {
     "title": "Personal Website",
     "description": "A responsive portfolio website built with modern web tech. Implements aggressive Persona 5 UI designs with GSAP animations.",
-    "tags": ["Next.js", "GSAP", "Tailwind"],
+    "tags": [
+      "Next.js",
+      "Typescript",
+      "GSAP"
+    ],
     "status": "COMPLETED",
-    "link": "https://github.com/rayhannafish"
+    "link": "http://prananda.my.id/"
   },
   {
-    "title": "Task Manager App",
+    "title": "Sianjab : HRIS ",
     "description": "A productivity app to manage tasks effectively with real-time sync and high performance backend.",
-    "tags": ["React", "Node.js", "Fullstack"],
+    "tags": [
+      "Laravel",
+      "PHP",
+      "Fullstack"
+    ],
     "status": "COMPLETED",
-    "link": "https://github.com/rayhannafish"
+    "link": "https://jagoanhosting.app/product/sianjab"
   },
   {
-    "title": "Weather Dashboard",
-    "description": "Real-time weather app using OpenWeather API with custom charting and responsive design.",
-    "tags": ["API", "Chart.js", "Tailwind"],
+    "title": "Unified",
+    "description": "Unified is a fintech mobile application prototype designed to streamline pre-marital and post-marital financial planning for couples",
+    "tags": [
+      "Flutter",
+      "Dart",
+      "Gemini API"
+    ],
     "status": "COMPLETED",
-    "link": "https://github.com/rayhannafish"
+    "link": "https://github.com/RN-1007/unified.git"
   },
   {
-    "title": "E-Commerce Clone",
-    "description": "Full functioning online store with payment gateways, cart system, and admin dashboard.",
-    "tags": ["Next.js", "Stripe", "Prisma"],
-    "status": "IN PROGRESS",
-    "link": "https://github.com/rayhannafish"
+    "title": "MyTicket",
+    "description": "Full functioning Travel APP with payment gateways, cart system, and admin dashboard.",
+    "tags": [
+      "Springboot",
+      "Java",
+      "Midtrans"
+    ],
+    "status": "Complete",
+    "link": "https://github.com/RN-1007/MyTicket.git"
   },
   {
-    "title": "Game Engine Tools",
-    "description": "Scripting utilities and map editors for a 2D indie game project.",
-    "tags": ["C++", "Python", "Tools"],
-    "status": "COMPLETED",
+    "title": "API Kost Finder",
+    "description": "API for backend service , provide data to frontend",
+    "tags": [
+      "Express",
+      "Javascript",
+      "API"
+    ],
+    "status": "Private",
     "link": "https://github.com/rayhannafish"
   }
 ]

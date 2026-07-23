@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎭 Persona 5 Themed Developer Portfolio
 
-## Getting Started
+A highly interactive, visually striking developer portfolio built with **Next.js**, **React**, **Tailwind CSS**, and **GSAP**. Heavily inspired by the iconic, dynamic, and aggressive UI/UX of *Persona 5*.
 
-First, run the development server:
+
+## ✨ Features
+
+- **Rebellious UI/UX**: Hard shadows, skewed elements, and striking red/black/white color palettes.
+- **Silky Smooth Animations**: Powered by `GSAP` and `Framer Motion` for cinematic page transitions and dynamic staggered element reveals.
+- **Smart Landscape Scaler**: A custom viewport scaling system that locks the layout perfectly at a 16:9 cinematic ratio (1280x720) across all devices, including ultra-wides and Android phones in landscape orientation.
+- **Immersive Audio**: Integrated interactive sound effects and background music using `Howler.js` to bring the Persona 5 aesthetic to life.
+- **Data-Driven Architecture**: Projects and certificates are decoupled from the UI and easily manageable via static JSON data files.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [GSAP](https://gsap.com/) & [Framer Motion](https://www.framer.com/motion/)
+- **Audio**: [Howler.js](https://howlerjs.com/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+
+## 🚀 Getting Started
+
+First, install the dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📝 Customization
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This portfolio is designed to be easily updated! You don't need to dive deep into the React code to add your own experience:
 
-## Learn More
+- **Projects**: Edit `/data/projects.json` to add or modify your showcased work.
+- **Certificates**: Edit `/data/certificates.json` to update your achievements and certifications.
+- **Assets**: Swap out images in the `/public/img/WEBP` and `/public/img/SVG` directories.
 
-To learn more about Next.js, take a look at the following resources:
+## 🎨 Design Philosophy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project aims to break away from the traditional, minimalist "corporate" web design. It embraces the bold, chaotic, yet highly organized aesthetic of Japanese role-playing games, proving that the web can be both highly functional and artistically rebellious.

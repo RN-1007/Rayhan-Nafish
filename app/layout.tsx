@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 import BackgroundMusic from '@/components/BackgroundMusic';
 import GameCursor from '@/components/ui/GameCursor';
 import MobileLandscapeScaler from '@/components/MobileLandscapeScaler';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function RootLayout({
   children,
@@ -31,6 +32,7 @@ export default function RootLayout({
           {children}
         </MobileLandscapeScaler>
         <GameCursor />
+        <Analytics />
       </body>
     </html>
   );

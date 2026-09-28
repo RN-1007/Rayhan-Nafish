@@ -11,13 +11,49 @@ import { Howl } from 'howler';
 
 const hoverSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/hover.mp3'], volume: 0.5 }) : null;
 const backSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/back.mp3'], volume: 0.8 }) : null;
+const selectSound = typeof window !== 'undefined' ? new Howl({ src: ['/sounds/select.mp3'], volume: 0.8 }) : null;
 
 const contactInfo = [
-  { icon: '✉', label: 'Email', value: 'rayhannafishdwip@gmail.com', color: 'text-[var(--color-primary)]', span: 'col-span-2' },
-  { icon: 'in', label: 'LinkedIn', value: 'rayhannafish', color: 'text-blue-400', span: 'col-span-2 md:col-span-1' },
-  { icon: 'IG', label: 'Instagram', value: '@rayhannafish', color: 'text-pink-500', span: 'col-span-2 md:col-span-1' },
-  { icon: '⌨', label: 'GitHub', value: 'RN-1007', color: 'text-white', span: 'col-span-2 md:col-span-1' },
-  { icon: '📍', label: 'Location', value: 'Madiun, ID', color: 'text-green-400', span: 'col-span-2 md:col-span-1' },
+  {
+    icon: '✉',
+    label: 'Email',
+    value: 'rayhannafishdwip@gmail.com',
+    link: 'https://mail.google.com/mail/?view=cm&fs=1&to=rayhannafishdwip@gmail.com',
+    color: 'text-[var(--color-primary)]',
+    span: 'col-span-2'
+  },
+  {
+    icon: 'in',
+    label: 'LinkedIn',
+    value: 'rayhannafish',
+    link: 'https://www.linkedin.com/in/rayhan-nafish-dwi-prananda/',
+    color: 'text-blue-400',
+    span: 'col-span-2 md:col-span-1'
+  },
+  {
+    icon: 'IG',
+    label: 'Instagram',
+    value: '@rayhannafish',
+    link: 'https://www.instagram.com/rayhan_nafish/',
+    color: 'text-pink-500',
+    span: 'col-span-2 md:col-span-1'
+  },
+  {
+    icon: '⌨',
+    label: 'GitHub',
+    value: 'RN-1007',
+    link: 'https://github.com/RN-1007',
+    color: 'text-white',
+    span: 'col-span-2 md:col-span-1'
+  },
+  {
+    icon: '📍',
+    label: 'Location',
+    value: 'Madiun, ID',
+    link: 'https://maps.google.com/?q=Madiun,+East+Java,+Indonesia',
+    color: 'text-green-400',
+    span: 'col-span-2 md:col-span-1'
+  },
 ];
 
 export default function ContactPage() {
@@ -71,12 +107,13 @@ export default function ContactPage() {
   }, { scope: pageRef });
 
   const handleSendCallingCard = () => {
+    selectSound?.play();
     const email = "rayhannafishdwip@gmail.com";
     const subject = encodeURIComponent("CALLING CARD: Let's Make A Deal! 🎩");
     const body = encodeURIComponent(
       "Hey Rayhan,\n\nI just visited your awesome portfolio and I'd like to make a deal with you!\n\nHere are my details:\n- Name: [Your Name]\n- Company/Role: [Your Company]\n- Purpose: [What you want to talk about]\n\nLet's talk soon!\n\nTake your time,\n[Your Name]"
     );
-    
+
     // Redirect langsung ke website Gmail (membuka tab baru) agar selalu bekerja meskipun user tidak memiliki aplikasi email default di komputernya.
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`;
     window.open(gmailUrl, '_blank');
@@ -115,27 +152,54 @@ export default function ContactPage() {
 
         {/* 2-Column Grid for Links */}
         <div className="grid grid-cols-2 gap-3 pl-1 md:pl-2">
-          {contactInfo.map((item) => (
-            <motion.div
-              key={item.label}
-              onMouseEnter={() => hoverSound?.play()}
-              className={`contact-item ${item.span} bg-black border-[3px] border-white p-3 flex items-center gap-3 transform skew-x-[-4deg] hard-shadow group clickable relative overflow-hidden transition-colors hover:bg-white`}
-              whileHover={{ x: 10, skewX: -2 }}
-            >
-              <div className="absolute inset-0 stripes-overlay opacity-10 pointer-events-none group-hover:opacity-5" />
+          {contactInfo.map((item) => {
+            const Content = (
+              <>
+                <div className="absolute inset-0 stripes-overlay opacity-10 pointer-events-none group-hover:opacity-5" />
 
-              {/* Icon */}
-              <div className={`w-10 h-10 md:w-12 md:h-12 bg-black border-2 border-white flex items-center justify-center transform -skew-x-6 text-lg md:text-xl font-black ${item.color} shrink-0 relative z-10 shadow-[3px_3px_0_0_rgba(255,255,255,0.4)] group-hover:shadow-[3px_3px_0_0_var(--color-primary)]`}>
-                <span className="skew-x-6 drop-shadow-md">{item.icon}</span>
-              </div>
+                {/* Icon */}
+                <div className={`w-10 h-10 md:w-12 md:h-12 bg-black border-2 border-white flex items-center justify-center transform -skew-x-6 text-lg md:text-xl font-black ${item.color} shrink-0 relative z-10 shadow-[3px_3px_0_0_rgba(255,255,255,0.4)] group-hover:shadow-[3px_3px_0_0_var(--color-primary)]`}>
+                  <span className="skew-x-6 drop-shadow-md">{item.icon}</span>
+                </div>
 
-              {/* Info */}
-              <div className="transform skew-x-[4deg] relative z-10 min-w-0 flex-1">
-                <p className="text-white/60 group-hover:text-[var(--color-primary)] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-0.5">{item.label}</p>
-                <p className="text-white group-hover:text-black font-bold text-sm md:text-base tracking-wide truncate">{item.value}</p>
-              </div>
-            </motion.div>
-          ))}
+                {/* Info */}
+                <div className="transform skew-x-[4deg] relative z-10 min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <p className="text-white/60 group-hover:text-[var(--color-primary)] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-0.5 truncate">{item.label}</p>
+                    {item.link && (
+                      <span className="text-white/40 group-hover:text-black text-xs font-black transform -skew-x-[4deg] group-hover:translate-x-0.5 transition-all">↗</span>
+                    )}
+                  </div>
+                  <p className="text-white group-hover:text-black font-bold text-sm md:text-base tracking-wide truncate">{item.value}</p>
+                </div>
+              </>
+            );
+
+            return item.link ? (
+              <motion.a
+                key={item.label}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => selectSound?.play()}
+                onMouseEnter={() => hoverSound?.play()}
+                className={`contact-item ${item.span} bg-black border-[3px] border-white p-3 flex items-center gap-3 transform skew-x-[-4deg] hard-shadow group clickable relative overflow-hidden transition-colors hover:bg-white cursor-pointer no-underline block`}
+                whileHover={{ x: 10, skewX: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {Content}
+              </motion.a>
+            ) : (
+              <motion.div
+                key={item.label}
+                onMouseEnter={() => hoverSound?.play()}
+                className={`contact-item ${item.span} bg-black border-[3px] border-white p-3 flex items-center gap-3 transform skew-x-[-4deg] hard-shadow group relative overflow-hidden transition-colors hover:bg-white`}
+                whileHover={{ x: 10, skewX: -2 }}
+              >
+                {Content}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Send Button */}

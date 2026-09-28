@@ -40,8 +40,19 @@
       "Java",
       "Midtrans"
     ],
-    "status": "Complete",
+    "status": "COMPLETED",
     "link": "https://github.com/RN-1007/MyTicket.git"
+  },
+  {
+    "title": "API Maxima",
+    "description": "Backend API service for Maxima application handling authentication, data operations, and RESTful API endpoints for client integrations.",
+    "tags": [
+      "Backend",
+      "REST API",
+      "Node.js"
+    ],
+    "status": "COMPLETED",
+    "link": "https://github.com/RN-1007/BE-Maxima.git"
   },
   {
     "title": "API Kost Finder",

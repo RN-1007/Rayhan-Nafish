@@ -11,13 +11,9 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
 
   useEffect(() => {
     setIsMounted(true);
-    const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
 
+    const handleResize = () => {
       // Define "mobile/tablet" as screens smaller than 1024px wide natively
-      // But wait, if we override the viewport to 1280, window.innerWidth becomes 1280!
-      // So we must check screen.width which is the physical device screen width.
       const physicalWidth = window.screen.width;
       const physicalHeight = window.screen.height;
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || Math.min(physicalWidth, physicalHeight) < 768;
@@ -36,16 +32,76 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
       setIsFullscreen(!!document.fullscreenElement);
     };
 
+    // 1. Prevent desktop keyboard zoom shortcuts (Ctrl/Cmd + '+', '-', '0', '=', '_')
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        const isZoomKey = 
+          e.key === '+' ||
+          e.key === '-' ||
+          e.key === '=' ||
+          e.key === '_' ||
+          e.key === '0' ||
+          e.code === 'Equal' ||
+          e.code === 'Minus' ||
+          e.code === 'Digit0' ||
+          e.code === 'NumpadAdd' ||
+          e.code === 'NumpadSubtract' ||
+          e.code === 'Numpad0';
+
+        if (isZoomKey) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    };
+
+    // 2. Prevent mouse wheel & touchpad pinch-to-zoom with Ctrl key
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    // 3. Prevent Safari/WebKit gesture zooming (trackpad pinch)
+    const preventGesture = (e: Event) => {
+      e.preventDefault();
+    };
+
+    // 4. Prevent multi-touch pinch zooming on touchscreens
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
     handleResize();
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
+    // Attach zoom prevention listeners
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    document.addEventListener('gesturestart', preventGesture);
+    document.addEventListener('gesturechange', preventGesture);
+    document.addEventListener('gestureend', preventGesture);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+
+      window.removeEventListener('keydown', handleKeyDown, { capture: true });
+      window.removeEventListener('wheel', handleWheel, { capture: true });
+      document.removeEventListener('wheel', handleWheel, { capture: true });
+      document.removeEventListener('gesturestart', preventGesture);
+      document.removeEventListener('gesturechange', preventGesture);
+      document.removeEventListener('gestureend', preventGesture);
+      document.removeEventListener('touchmove', handleTouchMove);
     };
   }, []);
 
@@ -83,12 +139,9 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
     const w = window.innerWidth;
     const h = window.innerHeight;
     
-    // We want the layout to ALWAYS be 1280px wide.
+    // We want the mobile landscape layout to ALWAYS be 1280px wide.
     const virtualWidth = 1280;
-    // Calculate the exact virtual height needed to perfectly fill the screen without black bars!
     const virtualHeight = virtualWidth * (h / w);
-    
-    // Scale factor to shrink the virtual layout down to the viewport pixels
     const scale = w / virtualWidth;
 
     return (
@@ -99,6 +152,7 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
             width: `${virtualWidth}px`, 
             height: `${virtualHeight}px`,
             transform: `scale(${scale})`,
+            transformOrigin: 'top left',
           }}
         >
           {children}
@@ -107,43 +161,8 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
     );
   }
 
-  // 3. For large desktop monitors or non-standard aspect ratios (ultrawide/square), force CSS scaling
-  // This preserves the exact laptop layout (1280x720 equivalent) on any monitor without breaking.
-  // Standard laptops (width <= 1536 and ~16:9 ratio) will bypass this and render natively!
-  if (!isMobile) {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    
-    const screenW = window.screen.width;
-    const screenH = window.screen.height;
-    const screenRatio = screenW / screenH;
-    
-    // Check physical screen dimensions to avoid triggering on laptops with browser UI
-    const isLargeOrWeirdMonitor = screenW > 2000 || screenRatio > 1.8 || screenRatio < 1.5;
-
-    if (isLargeOrWeirdMonitor) {
-      // Force a strict 16:9 layout just like a game engine
-      const virtualWidth = 1280;
-      const virtualHeight = 720;
-      const scale = Math.min(w / virtualWidth, h / virtualHeight);
-
-      return (
-        <div className="fixed inset-0 bg-black overflow-hidden pointer-events-none">
-          <div 
-            className="absolute top-1/2 left-1/2 bg-black pointer-events-auto"
-            style={{ 
-              width: `${virtualWidth}px`, 
-              height: `${virtualHeight}px`,
-              transform: `translate(-50%, -50%) scale(${scale})`,
-            }}
-          >
-            {children}
-          </div>
-        </div>
-      );
-    }
-  }
-
-  // 4. If standard laptop, render natively.
+  // 3. For Desktop: Render natively at 100% scale exactly as designed.
+  // All zoom shortcuts (Ctrl +, Ctrl -, Ctrl 0) and Ctrl+Wheel/trackpad gestures
+  // are strictly intercepted and blocked by the event listeners above, keeping the screen at 100%.
   return <div className="absolute inset-0">{children}</div>;
 }

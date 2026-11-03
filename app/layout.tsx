@@ -20,6 +20,7 @@ export const viewport: Viewport = {
 import BackgroundMusic from '@/components/BackgroundMusic';
 import GameCursor from '@/components/ui/GameCursor';
 import MobileLandscapeScaler from '@/components/MobileLandscapeScaler';
+import ProgressiveAssetPreloader from '@/components/ProgressiveAssetPreloader';
 import { Analytics } from '@vercel/analytics/react';
 
 export default function RootLayout({
@@ -36,6 +37,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
       </head>
       <body className="h-full">
+        <ProgressiveAssetPreloader />
         <BackgroundMusic />
         <MobileLandscapeScaler>
           {children}

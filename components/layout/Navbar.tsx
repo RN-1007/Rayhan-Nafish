@@ -8,6 +8,7 @@ export const Navbar = () => {
     { name: 'PROJECTS', href: '/projects' },
     { name: 'SKILLS', href: '/skills' },
     { name: 'CONTACT', href: '/contact' },
+    { name: 'MINI GAME', href: '/game' },
   ];
 
   return (

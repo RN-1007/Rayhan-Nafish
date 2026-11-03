@@ -20,6 +20,7 @@ const menuItems = [
   { id: 'projects', title: 'Projects', href: '/projects' },
   { id: 'skills', title: 'Skills', href: '/skills' },
   { id: 'contact', title: 'Contact', href: '/contact' },
+  { id: 'game', title: 'Mini Game (2D)', href: '/game' },
 ];
 
 /* ─── LOADING SCREEN ─── */
@@ -187,6 +188,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
       x: '0%',
       duration: 0.9,
       ease: 'power2.inOut',
+      force3D: true,
       onComplete: () => {
         router.push(href);
       }
@@ -515,7 +517,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
       </motion.div>
 
       <div 
-        className="wipe-overlay absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full"
+        className="wipe-overlay absolute top-0 bottom-0 left-[-50%] w-[150%] bg-[var(--color-primary)] z-[9999] pointer-events-none transform translate-x-full will-change-transform transform-gpu"
         style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         <div className="absolute inset-0 stripes-overlay opacity-30 pointer-events-none" />

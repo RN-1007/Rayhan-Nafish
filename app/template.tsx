@@ -25,12 +25,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
         gsap.set(wipeRef.current, { autoAlpha: 0 });
       }
     }, 0.2);
-
-    // Content scales in slightly (without opacity fade so internal wipes are visible)
-    gsap.fromTo(container.current,
-      { scale: 1.03, force3D: true },
-      { scale: 1, duration: 0.4, ease: 'power2.out', delay: 0.3, force3D: true }
-    );
   }, { scope: container });
 
   return (
@@ -41,7 +35,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
         className="absolute inset-0 z-[100] bg-[var(--color-primary)] pointer-events-none origin-left will-change-transform transform-gpu"
       />
 
-      <div ref={container} className="relative w-full h-full will-change-transform transform-gpu">
+      <div ref={container} className="relative w-full h-full">
         {children}
       </div>
     </>

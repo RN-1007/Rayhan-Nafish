@@ -404,7 +404,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
       </div>
 
       {/* Right Menu Stack */}
-      <div className="absolute top-[50%] -translate-y-1/2 right-[5%] md:right-[10%] z-40 flex flex-col gap-4">
+      <div className="absolute top-[50%] -translate-y-1/2 right-[5%] md:right-[10%] z-40 flex flex-col gap-3 md:gap-4">
         {menuItems.map((item, idx) => {
           const isActive = currentIndex === idx;
           // Generate a slightly different jagged shape per item for organic feel
@@ -441,7 +441,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
                     scale: isActive ? 1.05 : 1,
                   }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  className="relative w-[300px] md:w-[350px] h-[65px] md:h-[80px]"
+                  className="relative w-[290px] md:w-[350px] h-[58px] md:h-[76px]"
                 >
                   {/* Outer White Border (using clip-path) */}
                   <div
@@ -462,7 +462,7 @@ function MainMenu({ playEntranceWipe = false }: { playEntranceWipe?: boolean }) 
                   {/* Text */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className={`
-                      font-bold text-2xl md:text-3xl text-center transform -rotate-2
+                      font-bold text-xl md:text-3xl text-center transform -rotate-2
                       ${isActive ? 'text-white drop-shadow-md' : 'text-white'}
                     `}>
                       {item.title}

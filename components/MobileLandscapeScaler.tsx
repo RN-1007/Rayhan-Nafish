@@ -2,34 +2,43 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 export default function MobileLandscapeScaler({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isGamePage = pathname === '/game' || pathname?.startsWith('/game');
+
   const [isMobile, setIsMobile] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
 
-    const handleResize = () => {
-      // Define "mobile/tablet" as screens smaller than 1024px wide natively
+    const updateDimensions = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       const physicalWidth = window.screen.width;
       const physicalHeight = window.screen.height;
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || Math.min(physicalWidth, physicalHeight) < 768;
 
-      if (isMobileDevice) {
-        setIsMobile(true);
-        setIsPortrait(window.innerHeight > window.innerWidth);
-      } else {
-        // Normal Desktop
-        setIsMobile(false);
-        setIsPortrait(false);
-      }
+      setIsMobile(isMobileDevice);
+      setIsPortrait(h > w);
+      setDimensions({ width: w, height: h });
+    };
+
+    const handleResize = () => {
+      updateDimensions();
+      // On mobile browsers, orientationchange and fullscreen transitions take 100-300ms to settle viewport dimensions
+      setTimeout(updateDimensions, 100);
+      setTimeout(updateDimensions, 300);
     };
 
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
+      handleResize();
     };
 
     // 1. Prevent desktop keyboard zoom shortcuts (Ctrl/Cmd + '+', '-', '0', '=', '_')
@@ -110,6 +119,12 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
     return <div className="absolute inset-0">{children}</div>;
   }
 
+  // Mini-Game is a self-contained responsive HTML5 Canvas game that must ALWAYS fill 100% of the screen natively
+  // without being constrained to 1280px or shrunk to 1/4 screen size!
+  if (isGamePage) {
+    return <div className="fixed inset-0 w-full h-full bg-black overflow-hidden">{children}</div>;
+  }
+
   // 1. If mobile and portrait, show rotation warning
   if (isMobile && isPortrait) {
     return (
@@ -135,19 +150,20 @@ export default function MobileLandscapeScaler({ children }: { children: React.Re
   }
 
   // 2. If mobile and landscape, ALWAYS force CSS scaling
-  if (isMobile && !isPortrait && typeof window !== 'undefined') {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+  if (isMobile && !isPortrait) {
+    const w = dimensions.width || (typeof window !== 'undefined' ? window.innerWidth : 1280);
+    const h = dimensions.height || (typeof window !== 'undefined' ? window.innerHeight : 720);
     
     // We want the mobile landscape layout to ALWAYS be 1280px wide.
     const virtualWidth = 1280;
-    const virtualHeight = virtualWidth * (h / w);
+    // Calculate virtualHeight with Math.ceil to prevent subpixel letterbox borders
+    const virtualHeight = Math.ceil(virtualWidth * (h / w));
     const scale = w / virtualWidth;
 
     return (
-      <div className="fixed inset-0 bg-black overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 w-full h-full bg-black overflow-hidden pointer-events-none">
         <div 
-          className="absolute top-0 left-0 origin-top-left bg-black pointer-events-auto"
+          className="absolute top-0 left-0 origin-top-left pointer-events-auto"
           style={{ 
             width: `${virtualWidth}px`, 
             height: `${virtualHeight}px`,

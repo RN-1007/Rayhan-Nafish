@@ -489,6 +489,28 @@ export default function PokemonGame() {
   // Keyboard Keys Held State Tracker (Eliminates OS repeat stutter!)
   const keysHeld = useRef<Record<string, boolean>>({});
 
+  // Floating Touch Joystick State (Mobile / Android / Pointer Support)
+  const joystickRef = useRef<{
+    active: boolean;
+    touchId: number | null;
+    baseX: number;
+    baseY: number;
+    currX: number;
+    currY: number;
+    vectorX: number;
+    vectorY: number;
+  }>({
+    active: false,
+    touchId: null,
+    baseX: 0,
+    baseY: 0,
+    currX: 0,
+    currY: 0,
+    vectorX: 0,
+    vectorY: 0,
+  });
+  const isPointerDownRef = useRef(false);
+
   // Battle State
   const [currentEnemy, setCurrentEnemy] = useState<EnemyData | null>(null);
   const [battlePhase, setBattlePhase] = useState<BattlePhase>('INTRO');
@@ -746,6 +768,11 @@ export default function PokemonGame() {
 
     const handleBlur = () => {
       keysHeld.current = {};
+      isPointerDownRef.current = false;
+      joystickRef.current.active = false;
+      joystickRef.current.touchId = null;
+      joystickRef.current.vectorX = 0;
+      joystickRef.current.vectorY = 0;
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -803,19 +830,25 @@ export default function PokemonGame() {
       if (gameState === 'OVERWORLD') {
         const p = playerRef.current;
         const keys = keysHeld.current;
+        const joy = joystickRef.current;
 
         let inputX = 0;
         let inputY = 0;
 
-        if (keys['w'] || keys['arrowup']) inputY -= 1;
-        if (keys['s'] || keys['arrowdown']) inputY += 1;
-        if (keys['a'] || keys['arrowleft']) inputX -= 1;
-        if (keys['d'] || keys['arrowright']) inputX += 1;
+        if (joy.active && (Math.abs(joy.vectorX) > 0 || Math.abs(joy.vectorY) > 0)) {
+          inputX = joy.vectorX;
+          inputY = joy.vectorY;
+        } else {
+          if (keys['w'] || keys['arrowup']) inputY -= 1;
+          if (keys['s'] || keys['arrowdown']) inputY += 1;
+          if (keys['a'] || keys['arrowleft']) inputX -= 1;
+          if (keys['d'] || keys['arrowright']) inputX += 1;
 
-        // Diagonal normalization
-        if (inputX !== 0 && inputY !== 0) {
-          inputX *= 0.7071;
-          inputY *= 0.7071;
+          // Diagonal normalization
+          if (inputX !== 0 && inputY !== 0) {
+            inputX *= 0.7071;
+            inputY *= 0.7071;
+          }
         }
 
         const vx = inputX * WALK_SPEED;
@@ -850,9 +883,9 @@ export default function PokemonGame() {
         p.y = Math.max(0, Math.min(MAP_HEIGHT - 44, p.y));
 
         // Update direction
-        if (Math.abs(vy) > Math.abs(vx) && vy !== 0) {
+        if (Math.abs(vy) > Math.abs(vx) && Math.abs(vy) > 0.05) {
           p.direction = vy > 0 ? 'down' : 'up';
-        } else if (Math.abs(vx) > 0) {
+        } else if (Math.abs(vx) > 0.05) {
           p.direction = vx > 0 ? 'right' : 'left';
         }
 
@@ -902,6 +935,13 @@ export default function PokemonGame() {
         const cam = cameraRef.current;
         cam.x += (p.x - cam.x) * 0.08;
         cam.y += (p.y - cam.y) * 0.08;
+      } else {
+        if (joystickRef.current.active) {
+          joystickRef.current.active = false;
+          joystickRef.current.touchId = null;
+          joystickRef.current.vectorX = 0;
+          joystickRef.current.vectorY = 0;
+        }
       }
 
       // ── RENDERING ──
@@ -935,8 +975,11 @@ export default function PokemonGame() {
       const p = playerRef.current;
       const cam = cameraRef.current;
 
-      // Close-up cinematic zoom
-      const zoom = Math.max(2.1, Math.min(3.2, cvs.height / 280));
+      // Close-up cinematic zoom (responsive for desktop, mobile landscape, and mobile portrait)
+      const isPortrait = cvs.height > cvs.width;
+      const zoom = isPortrait
+        ? Math.max(1.6, Math.min(2.4, cvs.width / 200))
+        : Math.max(1.8, Math.min(3.2, cvs.height / 240));
       const viewW = cvs.width / zoom;
       const viewH = cvs.height / zoom;
 
@@ -1010,6 +1053,69 @@ export default function PokemonGame() {
       }
 
       c.restore();
+
+      // 5. FLOATING DYNAMIC JOYSTICK (Persona 5 Touch Control)
+      const joy = joystickRef.current;
+      if (joy.active) {
+        c.save();
+
+        // Outer Translucent Dark Plate
+        c.beginPath();
+        c.arc(joy.baseX, joy.baseY, 54, 0, Math.PI * 2);
+        c.fillStyle = 'rgba(15, 5, 8, 0.55)';
+        c.fill();
+        c.lineWidth = 2.5;
+        c.strokeStyle = '#D6001C';
+        c.stroke();
+
+        // Outer stylish dashed boundary ring
+        c.beginPath();
+        c.arc(joy.baseX, joy.baseY, 60, 0, Math.PI * 2);
+        c.setLineDash([4, 6]);
+        c.lineWidth = 1.5;
+        c.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        c.stroke();
+        c.setLineDash([]);
+
+        // 4 Cardinal Direction Crosshairs
+        const ticks = [
+          [0, -54],
+          [54, 0],
+          [0, 54],
+          [-54, 0],
+        ];
+        c.fillStyle = '#FFFFFF';
+        ticks.forEach(([tx, ty]) => {
+          c.beginPath();
+          c.arc(joy.baseX + tx, joy.baseY + ty, 2.5, 0, Math.PI * 2);
+          c.fill();
+        });
+
+        // Dynamic Connecting Laser
+        c.beginPath();
+        c.moveTo(joy.baseX, joy.baseY);
+        c.lineTo(joy.currX, joy.currY);
+        c.lineWidth = 3;
+        c.strokeStyle = 'rgba(255, 42, 77, 0.7)';
+        c.stroke();
+
+        // Floating Thumb Nub
+        c.beginPath();
+        c.arc(joy.currX, joy.currY, 22, 0, Math.PI * 2);
+        c.fillStyle = '#D6001C';
+        c.fill();
+        c.lineWidth = 2.5;
+        c.strokeStyle = '#FFFFFF';
+        c.stroke();
+
+        // Inner white dot
+        c.beginPath();
+        c.arc(joy.currX, joy.currY, 4.5, 0, Math.PI * 2);
+        c.fillStyle = '#FFFFFF';
+        c.fill();
+
+        c.restore();
+      }
     };
 
     /* ── DRAW PLAYER SPRITESHEET (PRECISE FRAME SLICING) ── */
@@ -1137,11 +1243,12 @@ export default function PokemonGame() {
         }
 
         // Enemy HUD Box (Top Left)
+        const hudW = Math.min(280, Math.max(180, W * 0.50));
         drawPersonaHudBox(
           c,
-          Math.max(20, W * 0.08),
-          Math.max(40, H * 0.12),
-          280,
+          Math.max(16, W * 0.05),
+          Math.max(24, H * 0.08),
+          hudW,
           72,
           currentEnemy.name,
           currentEnemy.level,
@@ -1183,11 +1290,12 @@ export default function PokemonGame() {
       }
 
       // Player HUD Box (Mid-Right)
+      const playerHudW = Math.min(280, Math.max(180, W * 0.50));
       drawPersonaHudBox(
         c,
-        Math.min(W - 300, W * 0.68),
-        H * 0.52,
-        280,
+        Math.max(16, Math.min(W - playerHudW - 16, W * 0.60)),
+        Math.max(H * 0.44, playerY - 45),
+        playerHudW,
         72,
         'RAYHAN (DEV)',
         7,
@@ -1276,7 +1384,8 @@ export default function PokemonGame() {
 
     /* ── DRAW BOTTOM BATTLE PANEL (HANYA 2 TOMBOL: ATTACK & RUN) ── */
     const drawPersonaBattlePanel = (c: CanvasRenderingContext2D, W: number, H: number) => {
-      const panelH = Math.min(130, H * 0.20);
+      const isNarrow = W < 680;
+      const panelH = isNarrow ? Math.min(150, Math.max(120, H * 0.25)) : Math.min(130, H * 0.20);
       const panelY = H - panelH;
 
       // Bottom bar background
@@ -1291,60 +1400,48 @@ export default function PokemonGame() {
 
       // Left Area: Dialogue Box Message
       c.fillStyle = '#FFFFFF';
-      c.font = 'bold 18px monospace';
+      c.font = isNarrow ? 'bold 15px monospace' : 'bold 18px monospace';
 
       if (battlePhase === 'INTRO') {
-        c.fillText(battleMessage, 40, panelY + 45);
+        c.fillText(battleMessage, 20, panelY + 45);
         c.fillStyle = '#FFEA00';
-        c.font = 'bold 14px monospace';
-        c.fillText('▶ Tekan [ENTER] / [SPASI] untuk bersiap bertarung!', 40, panelY + 80);
+        c.font = isNarrow ? 'bold 12px monospace' : 'bold 14px monospace';
+        c.fillText(isNarrow ? '▶ Sentuh layar untuk bersiap!' : '▶ Tekan [ENTER] / [SPASI] untuk bersiap bertarung!', 20, panelY + 75);
         return;
       }
 
       if (battlePhase === 'PLAYER_ATTACKING' || battlePhase === 'ENEMY_ATTACKING' || battlePhase === 'VICTORY' || battlePhase === 'DEFEAT' || battlePhase === 'RUN_AWAY') {
-        c.fillText(battleMessage, 40, panelY + 65);
+        c.fillText(battleMessage, 20, panelY + 65);
         return;
       }
 
       if (battlePhase === 'PLAYER_MENU') {
-        c.fillText(battleMessage, 40, panelY + 45);
-        c.fillStyle = '#999';
-        c.font = '12px monospace';
-        c.fillText('Gunakan [A] [D] untuk memilih • [ENTER] untuk Buka Spell Sihir', 40, panelY + 75);
+        if (isNarrow) {
+          c.fillText(battleMessage, 16, panelY + 28);
 
-        // Right Area: 2 LARGE STYLIZED BUTTONS: [ MAGIC ATTACK ] & [ RUN ]
-        const btnW = Math.min(220, W * 0.22);
-        const btnH = panelH - 30;
-        const btnY = panelY + 15;
+          const btnW = Math.max(130, (W - 36) / 2);
+          const btnH = panelH - 42;
+          const btnY = panelY + 36;
+          const btn1X = 14;
+          const btn2X = 14 + btnW + 8;
 
-        const btn1X = W - btnW * 2 - 40;
-        const btn2X = W - btnW - 20;
+          drawActionButton(c, btn1X, btnY, btnW, btnH, 'MAGIC ATTACK', '✦ SIHIR MAGE', selectedActionIndex === 0, '#D6001C');
+          drawActionButton(c, btn2X, btnY, btnW, btnH, 'RUN', '⚡ KABUR', selectedActionIndex === 1, '#222226');
+        } else {
+          c.fillText(battleMessage, 40, panelY + 45);
+          c.fillStyle = '#999';
+          c.font = '12px monospace';
+          c.fillText('Gunakan [A] [D] untuk memilih • [ENTER] untuk Buka Spell Sihir', 40, panelY + 75);
 
-        // Button 1: MAGIC ATTACK
-        drawActionButton(
-          c,
-          btn1X,
-          btnY,
-          btnW,
-          btnH,
-          'MAGIC ATTACK',
-          '✦ BUKA SIHIR MAGE',
-          selectedActionIndex === 0,
-          '#D6001C'
-        );
+          const btnW = Math.min(220, W * 0.22);
+          const btnH = panelH - 30;
+          const btnY = panelY + 15;
+          const btn1X = W - btnW * 2 - 40;
+          const btn2X = W - btnW - 20;
 
-        // Button 2: RUN
-        drawActionButton(
-          c,
-          btn2X,
-          btnY,
-          btnW,
-          btnH,
-          'RUN',
-          '⚡ KABUR CEPAT',
-          selectedActionIndex === 1,
-          '#222226'
-        );
+          drawActionButton(c, btn1X, btnY, btnW, btnH, 'MAGIC ATTACK', '✦ BUKA SIHIR MAGE', selectedActionIndex === 0, '#D6001C');
+          drawActionButton(c, btn2X, btnY, btnW, btnH, 'RUN', '⚡ KABUR CEPAT', selectedActionIndex === 1, '#222226');
+        }
         return;
       }
 
@@ -1352,31 +1449,33 @@ export default function PokemonGame() {
       if (battlePhase === 'SKILL_MENU') {
         const curSkill = MAGE_SKILLS[selectedSkillIndex] || MAGE_SKILLS[0];
 
-        // Left Panel: Spell Info & Elemental Styling
-        c.fillStyle = curSkill.color;
-        c.font = '900 20px sans-serif';
-        c.fillText(`[ ${curSkill.badge} ] ${curSkill.name}`, 40, panelY + 38);
+        if (!isNarrow) {
+          // Left Panel: Spell Info & Elemental Styling
+          c.fillStyle = curSkill.color;
+          c.font = '900 20px sans-serif';
+          c.fillText(`[ ${curSkill.badge} ] ${curSkill.name}`, 40, panelY + 38);
 
-        c.fillStyle = '#FFFFFF';
-        c.font = 'bold 12px monospace';
-        c.fillText(`💥 POWER: ${curSkill.minDamage} - ${curSkill.maxDamage} DMG  •  ${curSkill.description}`, 40, panelY + 64);
+          c.fillStyle = '#FFFFFF';
+          c.font = 'bold 12px monospace';
+          c.fillText(`💥 POWER: ${curSkill.minDamage} - ${curSkill.maxDamage} DMG  •  ${curSkill.description}`, 40, panelY + 64);
 
-        c.fillStyle = '#888888';
-        c.font = '11px monospace';
-        c.fillText('Navigasi: [WASD] / [Panah] • [ENTER] / Klik merapal • [ESC] / [Q] Batal', 40, panelY + 90);
+          c.fillStyle = '#888888';
+          c.font = '11px monospace';
+          c.fillText('Navigasi: [WASD] / [Panah] • [ENTER] / Klik merapal • [ESC] / [Q] Batal', 40, panelY + 90);
+        }
 
-        // Right Area: 2x2 Grid of Mage Spell Cards
-        const gridW = Math.min(460, W * 0.52);
-        const gridH = panelH - 24;
-        const gridX = W - gridW - 20;
-        const cardW = (gridW - 14) / 2;
+        // Right/Full Area: 2x2 Grid of Mage Spell Cards
+        const gridW = isNarrow ? W - 20 : Math.min(460, W * 0.52);
+        const gridH = panelH - 20;
+        const gridX = isNarrow ? 10 : W - gridW - 20;
+        const cardW = (gridW - 12) / 2;
         const cardH = (gridH - 10) / 2;
 
         MAGE_SKILLS.forEach((skill, idx) => {
           const col = idx % 2;
           const row = Math.floor(idx / 2);
-          const cardX = gridX + col * (cardW + 14);
-          const cardY = panelY + 12 + row * (cardH + 10);
+          const cardX = gridX + col * (cardW + 12);
+          const cardY = panelY + 10 + row * (cardH + 8);
           const isSelected = selectedSkillIndex === idx;
 
           drawSkillCard(c, cardX, cardY, cardW, cardH, skill, isSelected);
@@ -1525,9 +1624,86 @@ export default function PokemonGame() {
       c.restore();
     };
 
+    const getCanvasPos = (clientX: number, clientY: number) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / (rect.width || 1);
+      const scaleY = canvas.height / (rect.height || 1);
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
+      };
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
+      if (gameState !== 'OVERWORLD') return;
+      const pos = getCanvasPos(e.clientX, e.clientY);
+      // Skip top bar area (Exit button, HUD tools)
+      if (pos.y < 65) return;
+
+      // Accept touch or mouse left click
+      if (e.pointerType === 'touch' || e.pointerType === 'pen' || e.button === 0) {
+        isPointerDownRef.current = true;
+        joystickRef.current = {
+          active: true,
+          touchId: e.pointerId,
+          baseX: pos.x,
+          baseY: pos.y,
+          currX: pos.x,
+          currY: pos.y,
+          vectorX: 0,
+          vectorY: 0,
+        };
+      }
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isPointerDownRef.current || !joystickRef.current.active) return;
+      if (e.pointerId !== joystickRef.current.touchId) return;
+
+      const pos = getCanvasPos(e.clientX, e.clientY);
+      const dx = pos.x - joystickRef.current.baseX;
+      const dy = pos.y - joystickRef.current.baseY;
+      const dist = Math.hypot(dx, dy);
+      const MAX_RADIUS = 55;
+      const DEADZONE = 6;
+
+      if (dist > DEADZONE) {
+        const clampedDist = Math.min(dist, MAX_RADIUS);
+        const norm = clampedDist / MAX_RADIUS;
+        joystickRef.current.vectorX = (dx / dist) * norm;
+        joystickRef.current.vectorY = (dy / dist) * norm;
+        joystickRef.current.currX = joystickRef.current.baseX + (dx / dist) * clampedDist;
+        joystickRef.current.currY = joystickRef.current.baseY + (dy / dist) * clampedDist;
+      } else {
+        joystickRef.current.vectorX = 0;
+        joystickRef.current.vectorY = 0;
+        joystickRef.current.currX = pos.x;
+        joystickRef.current.currY = pos.y;
+      }
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (e.pointerId === joystickRef.current.touchId) {
+        isPointerDownRef.current = false;
+        joystickRef.current.active = false;
+        joystickRef.current.touchId = null;
+        joystickRef.current.vectorX = 0;
+        joystickRef.current.vectorY = 0;
+      }
+    };
+
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
     animId = requestAnimationFrame(render);
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      canvas.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
       cancelAnimationFrame(animId);
     };
   }, [gameState, battlePhase, battleMessage, currentEnemy, playerHp, maxPlayerHp, selectedActionIndex, selectedSkillIndex]);
@@ -1546,12 +1722,13 @@ export default function PokemonGame() {
     if (battlePhase === 'SKILL_MENU') {
       const W = window.innerWidth;
       const H = window.innerHeight;
-      const panelH = Math.min(130, H * 0.20);
+      const isNarrow = W < 680;
+      const panelH = isNarrow ? Math.min(150, Math.max(120, H * 0.25)) : Math.min(130, H * 0.20);
       const panelY = H - panelH;
-      const gridW = Math.min(460, W * 0.52);
-      const gridH = panelH - 24;
-      const gridX = W - gridW - 20;
-      const cardW = (gridW - 14) / 2;
+      const gridW = isNarrow ? W - 20 : Math.min(460, W * 0.52);
+      const gridH = panelH - 20;
+      const gridX = isNarrow ? 10 : W - gridW - 20;
+      const cardW = (gridW - 12) / 2;
       const cardH = (gridH - 10) / 2;
 
       const mx = e.clientX;
@@ -1560,8 +1737,8 @@ export default function PokemonGame() {
       for (let idx = 0; idx < MAGE_SKILLS.length; idx++) {
         const col = idx % 2;
         const row = Math.floor(idx / 2);
-        const cardX = gridX + col * (cardW + 14);
-        const cardY = panelY + 12 + row * (cardH + 10);
+        const cardX = gridX + col * (cardW + 12);
+        const cardY = panelY + 10 + row * (cardH + 8);
 
         if (mx >= cardX && mx <= cardX + cardW && my >= cardY && my <= cardY + cardH) {
           sounds.playSelect();
@@ -1583,23 +1760,27 @@ export default function PokemonGame() {
     if (battlePhase === 'PLAYER_MENU') {
       const W = window.innerWidth;
       const H = window.innerHeight;
-      const panelH = Math.min(130, H * 0.20);
-      const btnW = Math.min(220, W * 0.22);
-      const btnY = H - panelH + 15;
+      const isNarrow = W < 680;
+      const panelH = isNarrow ? Math.min(150, Math.max(120, H * 0.25)) : Math.min(130, H * 0.20);
+      const panelY = H - panelH;
 
-      const btn1X = W - btnW * 2 - 40;
-      const btn2X = W - btnW - 20;
+      const btnW = isNarrow ? Math.max(130, (W - 36) / 2) : Math.min(220, W * 0.22);
+      const btnH = isNarrow ? panelH - 42 : panelH - 30;
+      const btnY = isNarrow ? panelY + 36 : panelY + 15;
+
+      const btn1X = isNarrow ? 14 : W - btnW * 2 - 40;
+      const btn2X = isNarrow ? 14 + btnW + 8 : W - btnW - 20;
 
       const mx = e.clientX;
       const my = e.clientY;
 
-      if (mx >= btn1X && mx <= btn1X + btnW && my >= btnY && my <= btnY + panelH) {
+      if (mx >= btn1X && mx <= btn1X + btnW && my >= btnY && my <= btnY + btnH) {
         sounds.playSelect();
         setSelectedActionIndex(0);
         setBattlePhase('SKILL_MENU');
         setBattleMessage('PILIH SPELL SIHIR MAGE:');
         setSelectedSkillIndex(0);
-      } else if (mx >= btn2X && mx <= btn2X + btnW && my >= btnY && my <= btnY + panelH) {
+      } else if (mx >= btn2X && mx <= btn2X + btnW && my >= btnY && my <= btnY + btnH) {
         setSelectedActionIndex(1);
         executeRun();
       }
@@ -1617,12 +1798,12 @@ export default function PokemonGame() {
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen bg-black overflow-hidden select-none">
+    <div className="fixed inset-0 w-full h-full bg-black overflow-hidden select-none">
       {/* FULLSCREEN CANVAS */}
       <canvas
         ref={canvasRef}
         onClick={handleCanvasClick}
-        className="block w-full h-full cursor-pointer"
+        className="block w-full h-full cursor-pointer touch-none"
         style={{ imageRendering: 'pixelated' }}
       />
 
@@ -1637,7 +1818,7 @@ export default function PokemonGame() {
           <span>Exit ke Web</span>
         </Link>
 
-        {/* Center Hint for WASD Movement */}
+        {/* Center Hint for WASD Movement (Desktop) */}
         {gameState === 'OVERWORLD' && (
           <div className="hidden sm:flex items-center gap-3 px-4 py-1.5 bg-black/75 border border-white/20 text-neutral-300 text-xs font-mono backdrop-blur-sm">
             <span>
@@ -1651,6 +1832,14 @@ export default function PokemonGame() {
             <span className="text-neutral-400">
               Tekan <strong className="text-white">[H]</strong> Hitbox
             </span>
+          </div>
+        )}
+
+        {/* Mobile Floating Touch Hint */}
+        {gameState === 'OVERWORLD' && (
+          <div className="flex sm:hidden items-center gap-2 px-3 py-1 bg-black/80 border border-white/20 text-neutral-300 text-[11px] font-mono backdrop-blur-sm">
+            <span className="inline-block w-2 h-2 rounded-full bg-[#D6001C] animate-pulse" />
+            <span>Sentuh & geser layar untuk jalan</span>
           </div>
         )}
 

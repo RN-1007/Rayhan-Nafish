@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function GamePage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0c]">
+    <main className="fixed inset-0 w-full h-full bg-[#0a0a0c] overflow-hidden">
       <PokemonGame />
     </main>
   );
